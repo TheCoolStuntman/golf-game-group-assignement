@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 #include "resourceid.h"
 #include <GL/glew.h>
 
