@@ -387,6 +387,7 @@ Window::Close()
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 		nvgDeleteGLES3(this->vg);
+		Input::InputHandler::Destroy();
 		glfwTerminate();
 	}
 }
