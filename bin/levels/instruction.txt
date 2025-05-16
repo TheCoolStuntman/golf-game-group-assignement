@@ -1,0 +1,8 @@
+0 = open
+1 = side
+2 = corner
+3 = straight
+4 = urban
+5 = goal open
+6 = goal urban
+

@@ -20,6 +20,7 @@
 #include "render/physics.h"
 #include <chrono>
 #include "spaceship.h"
+#include "loader.h"
 
 using namespace Display;
 using namespace Render;
@@ -88,76 +89,88 @@ SpaceGameApp::Run()
     Camera* cam = CameraManager::GetCamera(CAMERA_MAIN);
     cam->projection = projection;
 
-    // load all resources
-    ModelId models[6] = {
-        LoadModel("assets/space/Asteroid_1.glb"),
-        LoadModel("assets/space/Asteroid_2.glb"),
-        LoadModel("assets/space/Asteroid_3.glb"),
-        LoadModel("assets/space/Asteroid_4.glb"),
-        LoadModel("assets/space/Asteroid_5.glb"),
-        LoadModel("assets/space/Asteroid_6.glb")
-    };
-    Physics::ColliderMeshId colliderMeshes[6] = {
-        Physics::LoadColliderMesh("assets/space/Asteroid_1_physics.glb"),
-        Physics::LoadColliderMesh("assets/space/Asteroid_2_physics.glb"),
-        Physics::LoadColliderMesh("assets/space/Asteroid_3_physics.glb"),
-        Physics::LoadColliderMesh("assets/space/Asteroid_4_physics.glb"),
-        Physics::LoadColliderMesh("assets/space/Asteroid_5_physics.glb"),
-        Physics::LoadColliderMesh("assets/space/Asteroid_6_physics.glb")
-    };
+    
+    //Create array for level parts
+    std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> testLevel;
+
+    //Load level
+    levelLoader::loadLevel("assets/levels/level-1.txt", testLevel);
+
+
 
     std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> asteroids;
     
-    // Setup asteroids near
-    for (int i = 0; i < 25; i++)
-    {
-        std::tuple<ModelId, Physics::ColliderId, glm::mat4> asteroid;
-        size_t resourceIndex = (size_t)(Core::FastRandom() % 6);
-        std::get<0>(asteroid) = models[resourceIndex];
-        float span = 20.0f;
-        glm::vec3 translation = glm::vec3(
-            Core::RandomFloatNTP() * span,
-            Core::RandomFloatNTP() * span,
-            Core::RandomFloatNTP() * span
-        );
-        glm::vec3 rotationAxis = normalize(translation);
-        float rotation = translation.x;
-        glm::mat4 transform = glm::rotate(rotation, rotationAxis) * glm::translate(translation);
-        std::get<1>(asteroid) = Physics::CreateCollider(colliderMeshes[resourceIndex], transform);
-        std::get<2>(asteroid) = transform;
-        asteroids.push_back(asteroid);
-    }
+    //// load all resources
+    //ModelId models[6] = {
+    //    LoadModel("assets/space/Asteroid_1.glb"),
+    //    LoadModel("assets/space/Asteroid_2.glb"),
+    //    LoadModel("assets/space/Asteroid_3.glb"),
+    //    LoadModel("assets/space/Asteroid_4.glb"),
+    //    LoadModel("assets/space/Asteroid_5.glb"),
+    //    LoadModel("assets/space/Asteroid_6.glb")
+    //};
+    //// load all collider meshes
+    //Physics::ColliderMeshId colliderMeshes[6] = {
+    //    Physics::LoadColliderMesh("assets/space/Asteroid_1_physics.glb"),
+    //    Physics::LoadColliderMesh("assets/space/Asteroid_2_physics.glb"),
+    //    Physics::LoadColliderMesh("assets/space/Asteroid_3_physics.glb"),
+    //    Physics::LoadColliderMesh("assets/space/Asteroid_4_physics.glb"),
+    //    Physics::LoadColliderMesh("assets/space/Asteroid_5_physics.glb"),
+    //    Physics::LoadColliderMesh("assets/space/Asteroid_6_physics.glb")
+    //};
 
-    // Setup asteroids far
-    for (int i = 0; i < 20; i++)
-    {
-        std::tuple<ModelId, Physics::ColliderId, glm::mat4> asteroid;
-        size_t resourceIndex = (size_t)(Core::FastRandom() % 6);
-        std::get<0>(asteroid) = models[resourceIndex];
-        float span = 80.0f;
-        glm::vec3 translation = glm::vec3(
-            Core::RandomFloatNTP() * span,
-            Core::RandomFloatNTP() * span,
-            Core::RandomFloatNTP() * span
-        );
-        glm::vec3 rotationAxis = normalize(translation);
-        float rotation = translation.x;
-        glm::mat4 transform = glm::rotate(rotation, rotationAxis) * glm::translate(translation);
-        std::get<1>(asteroid) = Physics::CreateCollider(colliderMeshes[resourceIndex], transform);
-        std::get<2>(asteroid) = transform;
-        asteroids.push_back(asteroid);
-    }
+    //// Setup asteroids near
+    //for (int i = 0; i < 25; i++)
+    //{
+    //    std::tuple<ModelId, Physics::ColliderId, glm::mat4> asteroid;
+    //    size_t resourceIndex = (size_t)(Core::FastRandom() % 6);
+    //    std::get<0>(asteroid) = models[resourceIndex];
+
+    //    float span = 20.0f;
+    //    glm::vec3 translation = glm::vec3(
+    //        Core::RandomFloatNTP() * span,
+    //        Core::RandomFloatNTP() * span,
+    //        Core::RandomFloatNTP() * span
+    //    );
+    //    glm::vec3 rotationAxis = normalize(translation);
+    //    float rotation = translation.x;
+    //    glm::mat4 transform = glm::rotate(rotation, rotationAxis) * glm::translate(translation);
+    //    std::get<1>(asteroid) = Physics::CreateCollider(colliderMeshes[resourceIndex], transform);
+    //    std::get<2 >(asteroid) = transform;
+    //    asteroids.push_back(asteroid);
+    //}
+
+    //// Setup asteroids far
+    //for (int i = 0; i < 20; i++)
+    //{
+    //    std::tuple<ModelId, Physics::ColliderId, glm::mat4> asteroid;
+    //    size_t resourceIndex = (size_t)(Core::FastRandom() % 6);
+    //    std::get<0>(asteroid) = models[resourceIndex];
+    //    float span = 80.0f;
+    //    glm::vec3 translation = glm::vec3(
+    //        Core::RandomFloatNTP() * span,
+    //        Core::RandomFloatNTP() * span,
+    //        Core::RandomFloatNTP() * span
+    //    );
+    //    glm::vec3 rotationAxis = normalize(translation);
+    //    float rotation = translation.x;
+    //    glm::mat4 transform = glm::rotate(rotation, rotationAxis) * glm::translate(translation);
+    //    std::get<1>(asteroid) = Physics::CreateCollider(colliderMeshes[resourceIndex], transform);
+    //    std::get<2>(asteroid) = transform;
+    //    asteroids.push_back(asteroid);
+    //}
 
     // Setup skybox
     std::vector<const char*> skybox
     {
-        "assets/space/bg.png",
-        "assets/space/bg.png",
-        "assets/space/bg.png",
-        "assets/space/bg.png",
-        "assets/space/bg.png",
-        "assets/space/bg.png"
+        "assets/golf/Textures/house.png",
+        "assets/golf/Textures/house.png",
+        "assets/golf/Textures/house.png",
+        "assets/golf/Textures/house.png",
+        "assets/golf/Textures/house.png",
+        "assets/golf/Textures/house.png"
     };
+
     TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
     RenderDevice::SetSkybox(skyboxId);
     
@@ -182,7 +195,7 @@ SpaceGameApp::Run()
     }
 
     SpaceShip ship;
-    ship.model = LoadModel("assets/space/spaceship.glb");
+    ship.model = LoadModel("assets/golf/ball-blue.glb");
 
     std::clock_t c_start = std::clock();
     double dt = 0.01667f;
@@ -207,6 +220,10 @@ SpaceGameApp::Run()
         ship.CheckCollisions();
 
         // Store all drawcalls in the render device
+        for (auto const& levelPiece : testLevel) {
+            RenderDevice::Draw(std::get<0>(levelPiece), std::get<2>(levelPiece));
+        }
+
         for (auto const& asteroid : asteroids)
         {
             RenderDevice::Draw(std::get<0>(asteroid), std::get<2>(asteroid));
