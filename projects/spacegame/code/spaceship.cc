@@ -43,12 +43,12 @@ SpaceShip::SpaceShip()
 void
 SpaceShip::Update(float dt)
 {
-    Mouse* mouse = Input::GetDefaultMouse();
-    Keyboard* kbd = Input::GetDefaultKeyboard();
-
+    //Mouse* mouse = Input::GetDefaultMouse();
+    //Keyboard* kbd = Input::GetDefaultKeyboard();
+    Gamepad* gpd = Input::GetCurrentGamepad();
     Camera* cam = CameraManager::GetCamera(CAMERA_MAIN);
 
-    if (kbd->held[Key::W])
+    /*if (kbd->held[Key::W])
     {
         if (kbd->held[Key::Shift])
             this->currentSpeed = mix(this->currentSpeed, this->boostSpeed, std::min(1.0f, dt * 30.0f));
@@ -58,15 +58,26 @@ SpaceShip::Update(float dt)
     else
     {
         this->currentSpeed = 0;
+    }*/
+
+    if (gpd->pressed[Input::GamepadButton::RIGHT_BUMPER]) {
+        this->currentSpeed = mix(this->currentSpeed, this->normalSpeed, std::min(1.0f, dt * 90.0f));
+    }
+    else {
+        this->currentSpeed = 0.0f;
     }
     vec3 desiredVelocity = vec3(0, 0, this->currentSpeed);
     desiredVelocity = this->transform * vec4(desiredVelocity, 0.0f);
 
     this->linearVelocity = mix(this->linearVelocity, desiredVelocity, dt * accelerationFactor);
 
-    float rotX = kbd->held[Key::Left] ? 1.0f : kbd->held[Key::Right] ? -1.0f : 0.0f;
+    /*float rotX = kbd->held[Key::Left] ? 1.0f : kbd->held[Key::Right] ? -1.0f : 0.0f;
     float rotY = kbd->held[Key::Up] ? -1.0f : kbd->held[Key::Down] ? 1.0f : 0.0f;
-    float rotZ = kbd->held[Key::A] ? -1.0f : kbd->held[Key::D] ? 1.0f : 0.0f;
+    float rotZ = kbd->held[Key::A] ? -1.0f : kbd->held[Key::D] ? 1.0f : 0.0f;*/
+
+    float rotX = -gpd->axis[Input::GamepadAxis::RIGHT_STICK_X];
+    float rotY = -gpd->axis[Input::GamepadAxis::RIGHT_STICK_Y];
+    float rotZ = gpd->axis[Input::GamepadAxis::LEFT_STICK_X];
 
     this->position += this->linearVelocity * dt * 10.0f;
 

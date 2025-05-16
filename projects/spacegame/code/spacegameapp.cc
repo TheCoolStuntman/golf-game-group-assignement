@@ -20,6 +20,7 @@
 #include "render/physics.h"
 #include <chrono>
 #include "spaceship.h"
+#include <iostream>
 
 using namespace Display;
 using namespace Render;
@@ -87,6 +88,22 @@ SpaceGameApp::Run()
     glm::mat4 projection = glm::perspective(glm::radians(90.0f), float(w) / float(h), 0.01f, 1000.f);
     Camera* cam = CameraManager::GetCamera(CAMERA_MAIN);
     cam->projection = projection;
+
+    for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
+        //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
+        if (glfwJoystickPresent(i)) {
+            Input::CreateGamepad(i);
+        }
+    }
+    const auto cgp = Input::GetCurrentGamepad();
+
+    /*int axis_c;
+    const float* axis = glfwGetJoystickAxes(cgp->id, &axis_c);
+
+    int buttons_c;
+    const unsigned char* buttons = glfwGetJoystickButtons(cgp->id, &buttons_c);
+
+    std::cout << "axis: " << axis_c << "\nbuttons: " << buttons_c << '\n';*/
 
     // load all resources
     ModelId models[6] = {
@@ -197,6 +214,7 @@ SpaceGameApp::Run()
 		glCullFace(GL_BACK);
         
         this->window->Update();
+        cgp->Update();
 
         if (kbd->pressed[Input::Key::Code::End])
         {
@@ -218,12 +236,12 @@ SpaceGameApp::Run()
         RenderDevice::Render(this->window, dt);
 
 		// transfer new frame to window
-		this->window->SwapBuffers();
+        this->window->SwapBuffers();
 
         auto timeEnd = std::chrono::steady_clock::now();
         dt = std::min(0.04, std::chrono::duration<double>(timeEnd - timeStart).count());
 
-        if (kbd->pressed[Input::Key::Code::Escape])
+        if (kbd->pressed[Input::Key::Code::Escape] || cgp->pressed[Input::GamepadButton::Code::BACK])
             this->Exit();
 	}
 }
