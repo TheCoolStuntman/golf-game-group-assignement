@@ -15,14 +15,13 @@ struct SpaceShip
     
     glm::vec3 position = glm::vec3(0);
     glm::quat orientation = glm::identity<glm::quat>();
-    glm::vec3 camPos = glm::vec3(0, 1.0f, -2.0f);
+    glm::vec3 camPos = glm::vec3(0, 0.0f, 0.5f);
     glm::mat4 transform = glm::mat4(1);
     glm::vec3 linearVelocity = glm::vec3(0);
 
-    const float normalSpeed = 1.0f;
-    const float boostSpeed = normalSpeed * 2.0f;
-    const float accelerationFactor = 1.0f;
-    const float camOffsetY = 1.0f;
+    const float maxSpeed = 2.0f;
+    const float minOffsetZ = 1.0f;
+    const float maxOffsetZ = 3.0f;
     const float cameraSmoothFactor = 10.0f;
 
     float currentSpeed = 0.0f;
@@ -32,10 +31,9 @@ struct SpaceShip
     float rotYSmooth = 0;
     float rotZSmooth = 0;
 
+    float offsetZ = minOffsetZ;
+
     Render::ModelId model;
-    Render::ParticleEmitter* particleEmitterLeft;
-    Render::ParticleEmitter* particleEmitterRight;
-    float emitterOffset = -0.5f;
 
     void Update(float dt);
 

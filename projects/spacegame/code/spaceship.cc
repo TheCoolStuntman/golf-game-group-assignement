@@ -28,30 +28,27 @@ namespace Game
         if (auto cgp = Input::GetCurrentGamepad(); cgp == nullptr) {
             rotX = kbd->held[Key::Left] ? 1.0f : kbd->held[Key::Right] ? -1.0f : 0.0f;
             rotY = kbd->held[Key::Up] ? -1.0f : kbd->held[Key::Down] ? 1.0f : 0.0f;
-            rotZ = kbd->held[Key::A] ? -1.0f : kbd->held[Key::D] ? 1.0f : 0.0f;
+            offsetZ += (kbd->held[Key::A] ? -1.0f : kbd->held[Key::D] ? 1.0f : 0.0f) * dt;
         }
         else {
             rotX = -gpd->axis[Input::GamepadAxis::RIGHT_STICK_X];
             rotY = -gpd->axis[Input::GamepadAxis::RIGHT_STICK_Y];
-            rotZ = gpd->axis[Input::GamepadAxis::LEFT_STICK_X];
+            offsetZ += gpd->axis[Input::GamepadAxis::LEFT_STICK_Y] * dt;
         }
+        offsetZ = Math::clamp(offsetZ, minOffsetZ, maxOffsetZ);
 
         this->position += this->linearVelocity * dt * 10.0f;
 
         const float rotationSpeed = 1.8f * dt;
         rotXSmooth = mix(rotXSmooth, rotX * rotationSpeed, dt * cameraSmoothFactor);
         rotYSmooth = mix(rotYSmooth, rotY * rotationSpeed, dt * cameraSmoothFactor);
-        rotZSmooth = mix(rotZSmooth, rotZ * rotationSpeed, dt * cameraSmoothFactor);
         quat localOrientation = quat(vec3(-rotYSmooth, rotXSmooth, rotZSmooth));
         this->orientation = this->orientation * localOrientation;
-        this->rotationZ -= rotXSmooth;
-        this->rotationZ = clamp(this->rotationZ, -45.0f, 45.0f);
-        mat4 T = translate(this->position) * (mat4)this->orientation;
-        this->transform = T * (mat4)quat(vec3(0, 0, rotationZ));
+        this->transform = translate(this->position) * (mat4)this->orientation;
         this->rotationZ = mix(this->rotationZ, 0.0f, dt * cameraSmoothFactor);
 
         // update camera view transform
-        vec3 desiredCamPos = this->position + vec3(this->transform * vec4(0, camOffsetY, -4.0f, 0));
+        vec3 desiredCamPos = this->position + vec3(this->transform * vec4(0, 0.0f, -offsetZ, 0));
         this->camPos = mix(this->camPos, desiredCamPos, dt * cameraSmoothFactor);
         cam->view = lookAt(this->camPos, this->camPos + vec3(this->transform[2]), vec3(this->transform[1]));
     }
@@ -68,12 +65,8 @@ namespace Game
             float len = glm::length(colliderEndPoints[i]);
             Physics::RaycastPayload payload = Physics::Raycast(position, dir, len);
 
-            // debug draw collision rays
-            // Debug::DrawLine(pos, pos + dir * len, 1.0f, glm::vec4(0, 1, 0, 1), glm::vec4(0, 1, 0, 1), Debug::RenderMode::AlwaysOnTop);
-
             if (payload.hit)
             {
-                Debug::DrawDebugText("HIT", payload.hitPoint, glm::vec4(1, 1, 1, 1));
                 hit = true;
             }
         }
