@@ -14,7 +14,6 @@ struct SpaceShip
     SpaceShip();
     
     glm::vec3 position = glm::vec3(0);
-    glm::quat orientation = glm::identity<glm::quat>();
     glm::vec3 camPos = glm::vec3(0, 0.0f, 0.5f);
     glm::mat4 transform = glm::mat4(1);
     glm::vec3 linearVelocity = glm::vec3(0);
@@ -26,10 +25,7 @@ struct SpaceShip
 
     float currentSpeed = 0.0f;
 
-    float rotationZ = 0;
-    float rotXSmooth = 0;
-    float rotYSmooth = 0;
-    float rotZSmooth = 0;
+    glm::vec3 rot;
 
     float offsetZ = minOffsetZ;
 

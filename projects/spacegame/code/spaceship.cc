@@ -26,26 +26,24 @@ namespace Game
 
         float rotX{ 0.0f }, rotY{ 0.0f }, rotZ{ 0.0f };
         if (auto cgp = Input::GetCurrentGamepad(); cgp == nullptr) {
-            rotX = kbd->held[Key::Left] ? 1.0f : kbd->held[Key::Right] ? -1.0f : 0.0f;
-            rotY = kbd->held[Key::Up] ? -1.0f : kbd->held[Key::Down] ? 1.0f : 0.0f;
-            offsetZ += (kbd->held[Key::A] ? -1.0f : kbd->held[Key::D] ? 1.0f : 0.0f) * dt;
+            rotX = kbd->held[Key::Up] ? 1.0f : kbd->held[Key::Down] ? -1.0f : 0.0f;
+            rotY = kbd->held[Key::Left] ? 1.0f : kbd->held[Key::Right] ? -1.0f : 0.0f;
+            offsetZ += (kbd->held[Key::A] ? 1.0f : kbd->held[Key::D] ? -1.0f : 0.0f) * dt;
         }
         else {
-            rotX = -gpd->axis[Input::GamepadAxis::RIGHT_STICK_X];
-            rotY = -gpd->axis[Input::GamepadAxis::RIGHT_STICK_Y];
+            rotX = -gpd->axis[Input::GamepadAxis::RIGHT_STICK_Y];
+            rotY = gpd->axis[Input::GamepadAxis::RIGHT_STICK_X];
             offsetZ += gpd->axis[Input::GamepadAxis::LEFT_STICK_Y] * dt;
         }
         offsetZ = Math::clamp(offsetZ, minOffsetZ, maxOffsetZ);
 
         this->position += this->linearVelocity * dt * 10.0f;
 
-        const float rotationSpeed = 1.8f * dt;
-        rotXSmooth = mix(rotXSmooth, rotX * rotationSpeed, dt * cameraSmoothFactor);
-        rotYSmooth = mix(rotYSmooth, rotY * rotationSpeed, dt * cameraSmoothFactor);
-        quat localOrientation = quat(vec3(-rotYSmooth, rotXSmooth, rotZSmooth));
-        this->orientation = this->orientation * localOrientation;
-        this->transform = translate(this->position) * (mat4)this->orientation;
-        this->rotationZ = mix(this->rotationZ, 0.0f, dt * cameraSmoothFactor);
+        const float rotationSpeed = 1.8f;
+        rot.x = rotX * rotationSpeed * dt;
+        rot.y = rotY * rotationSpeed * dt;
+
+        this->transform = this->transform * glm::translate(this->position) * glm::rotate(rot.x, glm::vec3(1, 0, 0)) * glm::rotate(rot.y, glm::vec3(0, 1, 0));
 
         // update camera view transform
         vec3 desiredCamPos = this->position + vec3(this->transform * vec4(0, 0.0f, -offsetZ, 0));
@@ -56,12 +54,11 @@ namespace Game
     bool
     SpaceShip::CheckCollisions()
     {
-        glm::mat4 rotation = (glm::mat4)orientation;
         bool hit = false;
         for (int i = 0; i < 8; i++)
         {
             glm::vec3 pos = position;
-            glm::vec3 dir = rotation * glm::vec4(glm::normalize(colliderEndPoints[i]), 0.0f);
+            glm::vec3 dir = rot * glm::normalize(colliderEndPoints[i]);
             float len = glm::length(colliderEndPoints[i]);
             Physics::RaycastPayload payload = Physics::Raycast(position, dir, len);
 

@@ -19,11 +19,7 @@
 #include "core/cvar.h"
 #include "render/physics.h"
 #include <chrono>
-#include "spaceship.h"
 #include "loader.h"
-#include <iostream>
-
-#include <iostream>
 
 using namespace Display;
 using namespace Render;
@@ -141,8 +137,10 @@ namespace Game
             lights[i] = Render::LightServer::CreatePointLight(translation, color, Core::RandomFloat() * 4.0f, 1.0f + (15 + Core::RandomFloat() * 10.0f));
         }
 
-        SpaceShip ship;
         ship.model = LoadModel("assets/golf/ball-blue.glb");
+        ship.position.y = 1.0f;
+        Physics::RaycastPayload hit = Physics::Raycast(glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
+        ship.position.y -= hit.hitDistance;
 
         std::clock_t c_start = std::clock();
         double dt = 0.01667f;
@@ -218,6 +216,17 @@ namespace Game
     SpaceGameApp::RenderNanoVG(NVGcontext* vg)
     {
         nvgSave(vg);
+
+        nvgBeginPath(vg);
+        nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
+        nvgStroke(vg);
+        nvgFontSize(vg, 18.0f);
+        nvgFontFace(vg, "sans");
+        nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
+        nvgText(vg, 0, 30, std::to_string(ship.rot.x).c_str(), NULL);
+        nvgText(vg, 0, 60, std::to_string(ship.rot.y).c_str(), NULL);
+        nvgText(vg, 0, 90, std::to_string(ship.rot.z).c_str(), NULL);
+
         nvgRestore(vg);
     }
 

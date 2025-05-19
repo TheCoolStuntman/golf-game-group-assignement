@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include "core/app.h"
 #include "render/window.h"
+#include "spaceship.h"
 
 namespace Game
 {
@@ -33,5 +34,7 @@ private:
 	void RenderNanoVG(NVGcontext* vg);
 
 	Display::Window* window;
+
+	SpaceShip ship;
 };
 } // namespace Game
