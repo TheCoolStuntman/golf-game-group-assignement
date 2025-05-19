@@ -13,6 +13,7 @@ struct HIDState
 {
 	Keyboard keyboard;
 	Mouse mouse;
+	Gamepad* current_gamepad;
 	std::vector<Gamepad*> gamepads;
 };
 
@@ -24,8 +25,19 @@ static HIDState* hid = nullptr;
 void
 InputHandler::Create()
 {
-	if (hid == nullptr)
+	if (hid == nullptr) {
 		hid = new HIDState();
+	}
+}
+
+void InputHandler::Destroy() {
+	if (hid != nullptr) {
+		while (hid->gamepads.size() > 0) {
+			delete hid->gamepads.back();
+			hid->gamepads.pop_back();
+		}
+		delete hid;
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -134,6 +146,15 @@ InputHandler::HandleMouseMoveEvent(double x, double y)
 	hid->mouse.delta = hid->mouse.position - hid->mouse.previousPosition;
 }
 
+void InputHandler::HandleJoystickEvent(int jid, int e) {
+	if (e == GLFW_CONNECTED) {
+		CreateGamepad(jid);
+	}
+	else if (e == GLFW_DISCONNECTED) {
+		DestroyGamepad(jid);
+	}
+}
+
 //------------------------------------------------------------------------------
 /**
 */
@@ -154,6 +175,12 @@ GetDefaultMouse()
 	return &hid->mouse;
 }
 
+Gamepad* GetCurrentGamepad()
+{
+	assert(hid != nullptr);
+	return hid->current_gamepad;
+}
+
 //------------------------------------------------------------------------------
 /**
 */
@@ -163,6 +190,35 @@ GetGamepad(int id)
 	assert(hid != nullptr);
 	assert(id > 0 && id < hid->gamepads.size());
 	return hid->gamepads[id];
+}
+
+int CreateGamepad(int id) {
+	assert(hid != nullptr);
+
+	hid->gamepads.emplace_back(new Gamepad(id));
+	hid->current_gamepad = hid->gamepads.back();
+	return hid->gamepads.size();
+}
+
+void DestroyGamepad(int id) {
+	assert(hid != nullptr);
+	assert(id >= 0 && id < hid->gamepads.size());
+
+	if (hid->gamepads.size() == 1) {
+		delete hid->gamepads.back();
+		hid->gamepads.pop_back();
+		hid->current_gamepad = nullptr;
+		return;
+	}
+
+	for (int i = 0; i < hid->gamepads.size(); ++i) {
+		if (hid->gamepads[i]->id == id) {
+			std::swap(hid->gamepads[i], hid->gamepads.back());
+			delete hid->gamepads.back();
+			hid->gamepads.pop_back();
+			hid->current_gamepad = hid->gamepads.back();
+		}
+	}
 }
 
 } // namespace Input

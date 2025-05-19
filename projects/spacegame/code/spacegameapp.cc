@@ -21,6 +21,7 @@
 #include <chrono>
 #include "spaceship.h"
 #include "loader.h"
+#include <iostream>
 
 using namespace Display;
 using namespace Render;
@@ -94,9 +95,15 @@ SpaceGameApp::Run()
     std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> testLevel;
 
     //Load level
-    levelLoader::loadLevel("assets/levels/level-1.txt", testLevel);
+    levelLoader::loadLevel("levels/level-1.txt", testLevel);
 
 
+    for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
+        //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
+        if (glfwJoystickPresent(i)) {
+            Input::CreateGamepad(i);
+        }
+    }
 
     std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> asteroids;
     
@@ -171,8 +178,8 @@ SpaceGameApp::Run()
         "assets/golf/Textures/house.png"
     };
 
-    TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
-    RenderDevice::SetSkybox(skyboxId);
+    //TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
+    //RenderDevice::SetSkybox(skyboxId);
     
     Input::Keyboard* kbd = Input::GetDefaultKeyboard();
 
@@ -210,6 +217,8 @@ SpaceGameApp::Run()
 		glCullFace(GL_BACK);
         
         this->window->Update();
+        if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr)
+            cgp->Update();
 
         if (kbd->pressed[Input::Key::Code::End])
         {
@@ -235,12 +244,14 @@ SpaceGameApp::Run()
         RenderDevice::Render(this->window, dt);
 
 		// transfer new frame to window
-		this->window->SwapBuffers();
+        this->window->SwapBuffers();
 
         auto timeEnd = std::chrono::steady_clock::now();
         dt = std::min(0.04, std::chrono::duration<double>(timeEnd - timeStart).count());
 
         if (kbd->pressed[Input::Key::Code::Escape])
+            this->Exit();
+        if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr && cgp->pressed[Input::GamepadButton::Code::BACK])
             this->Exit();
 	}
 }
