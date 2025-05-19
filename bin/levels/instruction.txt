@@ -1,8 +1,15 @@
 0 = open
 1 = side
 2 = corner
-3 = straight
-4 = urban
-5 = goal open
-6 = goal urban
+3 = round corner
+4 = inside corner
+5 = straight
+6 = walls to open
+7 = urban
+8 = goal open 
+9 = goal urban
 
+Every line is a tile separate by spaces ' '
+first is tile type
+second to fourth is xyz
+fifth is rotation in degrees rotation is done counter clockwise

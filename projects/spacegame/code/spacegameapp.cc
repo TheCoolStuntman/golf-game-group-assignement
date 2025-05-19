@@ -23,6 +23,8 @@
 #include "loader.h"
 #include <iostream>
 
+#include <iostream>
+
 using namespace Display;
 using namespace Render;
 
@@ -170,16 +172,16 @@ SpaceGameApp::Run()
     // Setup skybox
     std::vector<const char*> skybox
     {
-        "assets/golf/Textures/house.png",
-        "assets/golf/Textures/house.png",
-        "assets/golf/Textures/house.png",
-        "assets/golf/Textures/house.png",
-        "assets/golf/Textures/house.png",
-        "assets/golf/Textures/house.png"
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png"
     };
 
-    //TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
-    //RenderDevice::SetSkybox(skyboxId);
+    TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
+    RenderDevice::SetSkybox(skyboxId);
     
     Input::Keyboard* kbd = Input::GetDefaultKeyboard();
 
@@ -249,9 +251,9 @@ SpaceGameApp::Run()
         auto timeEnd = std::chrono::steady_clock::now();
         dt = std::min(0.04, std::chrono::duration<double>(timeEnd - timeStart).count());
 
-        if (kbd->pressed[Input::Key::Code::Escape])
-            this->Exit();
         if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr && cgp->pressed[Input::GamepadButton::Code::BACK])
+            this->Exit();
+        if (kbd->pressed[Input::Key::Code::Escape])
             this->Exit();
 	}
 }
