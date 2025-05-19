@@ -318,6 +318,7 @@ Window::Open()
 	glfwSetCursorPosCallback(this->window, Window::StaticMouseMoveCallback);
 	glfwSetCursorEnterCallback(this->window, Window::StaticMouseEnterLeaveCallback);
 	glfwSetScrollCallback(this->window, Window::StaticMouseScrollCallback);
+	glfwSetJoystickCallback(Input::InputHandler::HandleJoystickEvent);
 	glfwSetWindowSizeCallback(this->window, Window::StaticWindowResizeCallback);
 	glfwSetWindowCloseCallback(window, Window::StaticCloseCallback);
 	glfwSetWindowFocusCallback(window, Window::StaticFocusCallback);

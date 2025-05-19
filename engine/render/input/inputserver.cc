@@ -178,7 +178,6 @@ GetDefaultMouse()
 Gamepad* GetCurrentGamepad()
 {
 	assert(hid != nullptr);
-	assert(hid->current_gamepad != nullptr);
 	return hid->current_gamepad;
 }
 
@@ -204,6 +203,13 @@ int CreateGamepad(int id) {
 void DestroyGamepad(int id) {
 	assert(hid != nullptr);
 	assert(id >= 0 && id < hid->gamepads.size());
+
+	if (hid->gamepads.size() == 1) {
+		delete hid->gamepads.back();
+		hid->gamepads.pop_back();
+		hid->current_gamepad = nullptr;
+		return;
+	}
 
 	for (int i = 0; i < hid->gamepads.size(); ++i) {
 		if (hid->gamepads[i]->id == id) {

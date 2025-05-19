@@ -54,6 +54,7 @@ public:
 	void SetMouseEnterLeaveFunction(const std::function<void(bool)>& func);
 	/// set mouse scroll function callback
 	void SetMouseScrollFunction(const std::function<void(double, double)>& func);
+	void SetJoystickFunction(const std::function<void(int, int)>& func);
     /// set window resize function callback
     void SetWindowResizeFunction(const std::function<void(int32, int32)>& func);
 
@@ -101,6 +102,7 @@ private:
 	std::function<void(bool)> mouseLeaveEnterCallback;
 	/// function for mouse scroll callbacks
 	std::function<void(double, double)> mouseScrollCallback;
+	std::function<void(int, int)> joystickCallback;
     /// function for window resize callbacks
     std::function<void(int32, int32)> windowResizeCallback;
 	/// callback for ui rendering callback
@@ -209,6 +211,10 @@ inline void
 Window::SetMouseScrollFunction(const std::function<void(double, double)>& func)
 {
 	this->mouseScrollCallback = func;
+}
+
+inline void Window::SetJoystickFunction(const std::function<void(int, int)>& func) {
+	this->joystickCallback = func;
 }
 
 //------------------------------------------------------------------------------

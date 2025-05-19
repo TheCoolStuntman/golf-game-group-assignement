@@ -95,7 +95,6 @@ SpaceGameApp::Run()
             Input::CreateGamepad(i);
         }
     }
-    const auto cgp = Input::GetCurrentGamepad();
 
     /*int axis_c;
     const float* axis = glfwGetJoystickAxes(cgp->id, &axis_c);
@@ -214,7 +213,8 @@ SpaceGameApp::Run()
 		glCullFace(GL_BACK);
         
         this->window->Update();
-        cgp->Update();
+        if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr)
+            cgp->Update();
 
         if (kbd->pressed[Input::Key::Code::End])
         {
@@ -241,7 +241,9 @@ SpaceGameApp::Run()
         auto timeEnd = std::chrono::steady_clock::now();
         dt = std::min(0.04, std::chrono::duration<double>(timeEnd - timeStart).count());
 
-        if (kbd->pressed[Input::Key::Code::Escape] || cgp->pressed[Input::GamepadButton::Code::BACK])
+        if (kbd->pressed[Input::Key::Code::Escape])
+            this->Exit();
+        if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr && cgp->pressed[Input::GamepadButton::Code::BACK])
             this->Exit();
 	}
 }
