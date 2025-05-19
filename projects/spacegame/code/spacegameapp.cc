@@ -95,7 +95,7 @@ SpaceGameApp::Run()
     std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> testLevel;
 
     //Load level
-    levelLoader::loadLevel("assets/levels/level-1.txt", testLevel);
+    levelLoader::loadLevel("levels/level-1.txt", testLevel);
 
 
     for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
@@ -178,8 +178,8 @@ SpaceGameApp::Run()
         "assets/golf/Textures/house.png"
     };
 
-    TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
-    RenderDevice::SetSkybox(skyboxId);
+    //TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
+    //RenderDevice::SetSkybox(skyboxId);
     
     Input::Keyboard* kbd = Input::GetDefaultKeyboard();
 
