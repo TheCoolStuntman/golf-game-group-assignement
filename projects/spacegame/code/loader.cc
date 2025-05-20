@@ -26,9 +26,9 @@ namespace levelLoader {
 	void loadLevel(std::string levelName, std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>>& levelArray)
 	{
 
-		ModelId golfModels[10] = {
+		ModelId golfModels[11] = {
 			LoadModel("assets/golf/open.glb"),
-			LoadModel("assets/golf/side.glb"),
+			LoadModel("assets/golf/side.glb"),        
 			LoadModel("assets/golf/corner.glb"),
 			LoadModel("assets/golf/round-corner-c.glb"),
 			LoadModel("assets/golf/inner-corner.glb"),
@@ -36,10 +36,11 @@ namespace levelLoader {
 			LoadModel("assets/golf/walls-to-open.glb"),
 			LoadModel("assets/golf/end.glb"),
 			LoadModel("assets/golf/hole-open.glb"),
-			LoadModel("assets/golf/hole-square.glb")
+			LoadModel("assets/golf/hole-square.glb"),
+			LoadModel("assets/golf/flag-red.glb")
 		};
 
-		Physics::ColliderMeshId golfColliderMeshes[10] = {
+		Physics::ColliderMeshId golfColliderMeshes[11] = {
 			Physics::LoadColliderMesh("assets/golf/open.glb"),
 			Physics::LoadColliderMesh("assets/golf/side.glb"),
 			Physics::LoadColliderMesh("assets/golf/corner.glb"),
@@ -49,7 +50,8 @@ namespace levelLoader {
 			Physics::LoadColliderMesh("assets/golf/walls-to-open.glb"),
 			Physics::LoadColliderMesh("assets/golf/end.glb"),
 			Physics::LoadColliderMesh("assets/golf/hole-open.glb"),
-			Physics::LoadColliderMesh("assets/golf/hole-square.glb")
+			Physics::LoadColliderMesh("assets/golf/hole-square.glb"),
+			Physics::LoadColliderMesh("assets/golf/flag-red.glb")
 		};
 
 		std::tuple<ModelId, Physics::ColliderId, glm::mat4> levelPiece;
@@ -65,6 +67,11 @@ namespace levelLoader {
 		while (std::getline(inputFile, tile)) {
 			std::vector<std::string> tileInfo = splitString(tile);
 			
+			if (stoi(tileInfo[0]) == -1) {
+				//Do startpos shit
+				continue;
+			}
+
 			std::get<0>(levelPiece) = golfModels[stoi(tileInfo[0])];
 			glm::vec3 translation = glm::vec3(stoi(tileInfo[1]), stoi(tileInfo[2]), stoi(tileInfo[3]));
 			

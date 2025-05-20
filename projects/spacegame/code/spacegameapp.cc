@@ -172,12 +172,12 @@ SpaceGameApp::Run()
     // Setup skybox
     std::vector<const char*> skybox
     {
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png"
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png"
     };
 
     TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);

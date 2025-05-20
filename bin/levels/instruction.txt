@@ -1,3 +1,4 @@
+-1 = start position
 0 = open
 1 = side
 2 = corner
@@ -8,8 +9,9 @@
 7 = urban
 8 = goal open 
 9 = goal urban
+10 = goal flag
 
 Every line is a tile separate by spaces ' '
 first is tile type
 second to fourth is xyz
-fifth is rotation in degrees rotation is done counter clockwise
+fifth is rotation in degrees rotation, counter clockwise
