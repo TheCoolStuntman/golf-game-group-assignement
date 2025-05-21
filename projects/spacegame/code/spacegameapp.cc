@@ -20,6 +20,10 @@
 #include "render/physics.h"
 #include <chrono>
 #include "loader.h"
+#include <iostream>
+#include <fstream>
+
+#include <iostream>
 
 using namespace Display;
 using namespace Render;
@@ -88,13 +92,50 @@ SpaceGameApp::Run()
     Camera* cam = CameraManager::GetCamera(CAMERA_MAIN);
     cam->projection = projection;
 
+    ModelId golfModels[14] = {
+        LoadModel("assets/golf/open.glb"),
+        LoadModel("assets/golf/side.glb"),
+        LoadModel("assets/golf/corner.glb"),
+        LoadModel("assets/golf/square-corner-a.glb"),
+        LoadModel("assets/golf/round-corner-c.glb"),
+        LoadModel("assets/golf/round-corner-a.glb"),
+        LoadModel("assets/golf/round-corner-b.glb"),
+        LoadModel("assets/golf/inner-corner.glb"),
+        LoadModel("assets/golf/straight.glb"),
+        LoadModel("assets/golf/walls-to-open.glb"),
+        LoadModel("assets/golf/end.glb"),
+        LoadModel("assets/golf/hole-open.glb"),
+        LoadModel("assets/golf/hole-square.glb"),
+        LoadModel("assets/golf/flag-red.glb")
+    };
+
+    Physics::ColliderMeshId golfColliderMeshes[14] = {
+        Physics::LoadColliderMesh("assets/golf/open.glb"),
+        Physics::LoadColliderMesh("assets/golf/side.glb"),
+        Physics::LoadColliderMesh("assets/golf/corner.glb"),
+        Physics::LoadColliderMesh("assets/golf/square-corner-a.glb"),
+        Physics::LoadColliderMesh("assets/golf/round-corner-c.glb"),
+        Physics::LoadColliderMesh("assets/golf/round-corner-a.glb"),
+        Physics::LoadColliderMesh("assets/golf/round-corner-b.glb"),
+        Physics::LoadColliderMesh("assets/golf/inner-corner.glb"),
+        Physics::LoadColliderMesh("assets/golf/straight.glb"),
+        Physics::LoadColliderMesh("assets/golf/walls-to-open.glb"),
+        Physics::LoadColliderMesh("assets/golf/end.glb"),
+        Physics::LoadColliderMesh("assets/golf/hole-open.glb"),
+        Physics::LoadColliderMesh("assets/golf/hole-square.glb"),
+        Physics::LoadColliderMesh("assets/golf/flag-red.glb")
+    };
     
-    //Create array for level parts
-    std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> testLevel;
+    //Set up level array and load level 1
+    std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> levelArray;
+    std::vector<std::string> levelPath = { "levels/level-1.txt", "levels/level-2.txt", "levels/level-3.txt" };
+    int cl = 0; //curren Level
+    levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
 
-    //Load level
-    levelLoader::loadLevel("levels/level-1.txt", testLevel);
-
+    //Score variables
+    int strokes = 0;
+    bool levelComplete = false;
+    std::vector<std::string> highscorePath = { "highscores/highscore-level-1.txt", "highscores/highscore-level-2.txt", "highscores/highscore-level-3.txt" };
 
     for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
         //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
@@ -102,22 +143,21 @@ SpaceGameApp::Run()
             Input::CreateGamepad(i);
         }
     }
-
+    
     // Setup skybox
     std::vector<const char*> skybox
     {
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png",
-        "textures/house.png"
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png",
+        "textures/vikkitor.png"
     };
 
     TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
     RenderDevice::SetSkybox(skyboxId);
-    
-    Input::Keyboard* kbd = Input::GetDefaultKeyboard();
+   
 
     const int numLights = 4;
     Render::PointLightId lights[numLights];
@@ -158,6 +198,9 @@ SpaceGameApp::Run()
         if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr)
             cgp->Update();
 
+        Input::Keyboard* kbd = Input::GetDefaultKeyboard();
+        Input::Gamepad* gpd = Input::GetCurrentGamepad();
+
         if (kbd->pressed[Input::Key::Code::End])
         {
             ShaderResource::ReloadShaders();
@@ -165,9 +208,35 @@ SpaceGameApp::Run()
 
         ship.Update(dt);
         ship.CheckCollisions();
+        
+        //Highscore system
+        if (levelComplete) {
+            //take file put in ordered list or some shit
+            std::fstream highscoreFile(highscorePath[cl]);
+
+            //add new score
+            //Write again
+            //Reset position and strokes
+        }
+
+        //Is probably a better way to do this but didn't want to send the entire map every tick to a function 
+        if (auto cgp = Input::GetCurrentGamepad(); cgp == nullptr) {
+            if (kbd->pressed[Input::Key::K]) {
+                ++cl %= 3;
+                levelArray.clear();
+                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+            }
+        } else {
+            if (gpd->pressed[Input::GamepadButton::X]) {
+                ++cl %= 3;
+                levelArray.clear();
+                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+            }
+        }
+        
 
         // Store all drawcalls in the render device
-        for (auto const& levelPiece : testLevel) {
+        for (auto const& levelPiece : levelArray) {
             RenderDevice::Draw(std::get<0>(levelPiece), std::get<2>(levelPiece));
         }
 

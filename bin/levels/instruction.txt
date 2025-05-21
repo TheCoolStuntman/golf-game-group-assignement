@@ -1,15 +1,20 @@
+-1 = start position
 0 = open
 1 = side
 2 = corner
-3 = round corner
-4 = inside corner
-5 = straight
-6 = walls to open
-7 = urban
-8 = goal open 
-9 = goal urban
+3 = corner with inside corner 
+4 = round corner
+5 = round corner with inside corner
+6 = round corner with inside corner and fat wall
+7 = inside corner
+8 = straight
+9 = walls to open
+10 = urban
+11 = goal open 
+12 = goal urban
+13 = goal flag
 
 Every line is a tile separate by spaces ' '
 first is tile type
 second to fourth is xyz
-fifth is rotation in degrees rotation is done counter clockwise
+fifth is rotation in degrees rotation, counter clockwise

@@ -23,34 +23,10 @@ namespace levelLoader {
 		return tokens;
 	}
 
-	void loadLevel(std::string levelName, std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>>& levelArray)
+	void loadLevel(std::string levelName, std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>>& levelArray, ModelId golfModels[14], Physics::ColliderMeshId golfColliderMeshes[14])
 	{
 
-		ModelId golfModels[10] = {
-			LoadModel("assets/golf/open.glb"),
-			LoadModel("assets/golf/side.glb"),
-			LoadModel("assets/golf/corner.glb"),
-			LoadModel("assets/golf/round-corner-c.glb"),
-			LoadModel("assets/golf/inner-corner.glb"),
-			LoadModel("assets/golf/straight.glb"),
-			LoadModel("assets/golf/walls-to-open.glb"),
-			LoadModel("assets/golf/end.glb"),
-			LoadModel("assets/golf/hole-open.glb"),
-			LoadModel("assets/golf/hole-square.glb")
-		};
-
-		Physics::ColliderMeshId golfColliderMeshes[10] = {
-			Physics::LoadColliderMesh("assets/golf/open.glb"),
-			Physics::LoadColliderMesh("assets/golf/side.glb"),
-			Physics::LoadColliderMesh("assets/golf/corner.glb"),
-			Physics::LoadColliderMesh("assets/golf/round-corner-c.glb"),
-			Physics::LoadColliderMesh("assets/golf/inner-corner.glb"),
-			Physics::LoadColliderMesh("assets/golf/straight.glb"),
-			Physics::LoadColliderMesh("assets/golf/walls-to-open.glb"),
-			Physics::LoadColliderMesh("assets/golf/end.glb"),
-			Physics::LoadColliderMesh("assets/golf/hole-open.glb"),
-			Physics::LoadColliderMesh("assets/golf/hole-square.glb")
-		};
+		
 
 		std::tuple<ModelId, Physics::ColliderId, glm::mat4> levelPiece;
 
@@ -65,6 +41,11 @@ namespace levelLoader {
 		while (std::getline(inputFile, tile)) {
 			std::vector<std::string> tileInfo = splitString(tile);
 			
+			if (stoi(tileInfo[0]) == -1) {
+				//Do startpos shit
+				continue;
+			}
+
 			std::get<0>(levelPiece) = golfModels[stoi(tileInfo[0])];
 			glm::vec3 translation = glm::vec3(stoi(tileInfo[1]), stoi(tileInfo[2]), stoi(tileInfo[3]));
 			
@@ -76,5 +57,7 @@ namespace levelLoader {
 		}
 
 		inputFile.close();
+
+
 	}
 }

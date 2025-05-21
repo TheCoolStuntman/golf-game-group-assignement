@@ -8,7 +8,7 @@
 using namespace Render;
 
 namespace levelLoader {
-	void loadLevel(std::string levelName, std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>>& levelArray);
+	void loadLevel(std::string levelName, std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>>& levelArray, ModelId golfModels[14], Physics::ColliderMeshId golfColliderMeshes[14]);
 
 
 }
