@@ -27,207 +27,207 @@ using namespace Render;
 namespace Game
 {
 
-    //------------------------------------------------------------------------------
-    /**
-    */
-    SpaceGameApp::SpaceGameApp()
-    {
-        // empty
-    }
+//------------------------------------------------------------------------------
+/**
+*/
+SpaceGameApp::SpaceGameApp()
+{
+    // empty
+}
 
-    //------------------------------------------------------------------------------
-    /**
-    */
-    SpaceGameApp::~SpaceGameApp()
-    {
-	    // empty
-    }
+//------------------------------------------------------------------------------
+/**
+*/
+SpaceGameApp::~SpaceGameApp()
+{
+	// empty
+}
 
-    //------------------------------------------------------------------------------
-    /**
-    */
-    bool
-    SpaceGameApp::Open()
-    {
-	    App::Open();
-	    this->window = new Display::Window;
-        this->window->SetSize(1280, 720);
+//------------------------------------------------------------------------------
+/**
+*/
+bool
+SpaceGameApp::Open()
+{
+	App::Open();
+	this->window = new Display::Window;
+    this->window->SetSize(1280, 720);
 
-        if (this->window->Open())
-	    {
-		    // set clear color to gray
-		    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    if (this->window->Open())
+	{
+		// set clear color to gray
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-            RenderDevice::Init();
+        RenderDevice::Init();
 
-		    // set ui rendering function
-		    this->window->SetUiRender([this]()
-		    {
-			    this->RenderUI();
-		    });
-            this->window->SetNanoFunc([this](NVGcontext* vg)
-            {
-                this->RenderNanoVG(vg);
-            });
+		// set ui rendering function
+		this->window->SetUiRender([this]()
+		{
+			this->RenderUI();
+		});
+        this->window->SetNanoFunc([this](NVGcontext* vg)
+        {
+            this->RenderNanoVG(vg);
+        });
         
-            return true;
-	    }
-	    return false;
-    }
+        return true;
+	}
+	return false;
+}
 
-    //------------------------------------------------------------------------------
-    /**
-    */
-    void
-    SpaceGameApp::Run()
-    {
-        int w;
-        int h;
-        this->window->GetSize(w, h);
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(w) / float(h), 0.01f, 1000.f);
-        Camera* cam = CameraManager::GetCamera(CAMERA_MAIN);
-        cam->projection = projection;
+//------------------------------------------------------------------------------
+/**
+*/
+void
+SpaceGameApp::Run()
+{
+    int w;
+    int h;
+    this->window->GetSize(w, h);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(w) / float(h), 0.01f, 1000.f);
+    Camera* cam = CameraManager::GetCamera(CAMERA_MAIN);
+    cam->projection = projection;
 
     
-        //Create array for level parts
-        std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> testLevel;
+    //Create array for level parts
+    std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> testLevel;
 
-        //Load level
-        levelLoader::loadLevel("levels/level-1.txt", testLevel);
+    //Load level
+    levelLoader::loadLevel("levels/level-1.txt", testLevel);
 
 
-        for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
-            //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
-            if (glfwJoystickPresent(i)) {
-                Input::CreateGamepad(i);
-            }
+    for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
+        //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
+        if (glfwJoystickPresent(i)) {
+            Input::CreateGamepad(i);
         }
+    }
 
-        // Setup skybox
-        std::vector<const char*> skybox
-        {
-            "textures/house.png",
-            "textures/house.png",
-            "textures/house.png",
-            "textures/house.png",
-            "textures/house.png",
-            "textures/house.png"
-        };
+    // Setup skybox
+    std::vector<const char*> skybox
+    {
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png",
+        "textures/house.png"
+    };
 
-        TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
-        RenderDevice::SetSkybox(skyboxId);
+    TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
+    RenderDevice::SetSkybox(skyboxId);
     
-        Input::Keyboard* kbd = Input::GetDefaultKeyboard();
+    Input::Keyboard* kbd = Input::GetDefaultKeyboard();
 
-        const int numLights = 4;
-        Render::PointLightId lights[numLights];
-        // Setup lights
-        for (int i = 0; i < numLights; i++)
+    const int numLights = 4;
+    Render::PointLightId lights[numLights];
+    // Setup lights
+    for (int i = 0; i < numLights; i++)
+    {
+        glm::vec3 translation = glm::vec3(
+            Core::RandomFloatNTP() * 20.0f,
+            Core::RandomFloatNTP() * 20.0f,
+            Core::RandomFloatNTP() * 20.0f
+        );
+        glm::vec3 color = glm::vec3(
+            Core::RandomFloat(),
+            Core::RandomFloat(),
+            Core::RandomFloat()
+        );
+        lights[i] = Render::LightServer::CreatePointLight(translation, color, Core::RandomFloat() * 4.0f, 1.0f + (15 + Core::RandomFloat() * 10.0f));
+    }
+
+    ship.model = LoadModel("assets/golf/ball-blue.glb");
+    ship.position.y = 1.0f;
+    Physics::RaycastPayload hit = Physics::Raycast(glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
+    ship.position.y -= hit.hitDistance;
+
+    std::clock_t c_start = std::clock();
+    double dt = 0.01667f;
+
+    // game loop
+    while (this->window->IsOpen())
+	{
+        auto timeStart = std::chrono::steady_clock::now();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+        
+        this->window->Update();
+        if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr)
+            cgp->Update();
+
+        if (kbd->pressed[Input::Key::Code::End])
         {
-            glm::vec3 translation = glm::vec3(
-                Core::RandomFloatNTP() * 20.0f,
-                Core::RandomFloatNTP() * 20.0f,
-                Core::RandomFloatNTP() * 20.0f
-            );
-            glm::vec3 color = glm::vec3(
-                Core::RandomFloat(),
-                Core::RandomFloat(),
-                Core::RandomFloat()
-            );
-            lights[i] = Render::LightServer::CreatePointLight(translation, color, Core::RandomFloat() * 4.0f, 1.0f + (15 + Core::RandomFloat() * 10.0f));
+            ShaderResource::ReloadShaders();
         }
 
-        ship.model = LoadModel("assets/golf/ball-blue.glb");
-        ship.position.y = 1.0f;
-        Physics::RaycastPayload hit = Physics::Raycast(glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
-        ship.position.y -= hit.hitDistance;
+        ship.Update(dt);
+        ship.CheckCollisions();
 
-        std::clock_t c_start = std::clock();
-        double dt = 0.01667f;
+        // Store all drawcalls in the render device
+        for (auto const& levelPiece : testLevel) {
+            RenderDevice::Draw(std::get<0>(levelPiece), std::get<2>(levelPiece));
+        }
 
-        // game loop
-        while (this->window->IsOpen())
-	    {
-            auto timeStart = std::chrono::steady_clock::now();
-		    glClear(GL_DEPTH_BUFFER_BIT);
-		    glEnable(GL_DEPTH_TEST);
-		    glEnable(GL_CULL_FACE);
-		    glCullFace(GL_BACK);
-        
-            this->window->Update();
-            if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr)
-                cgp->Update();
+        RenderDevice::Draw(ship.model, ship.transform);
 
-            if (kbd->pressed[Input::Key::Code::End])
-            {
-                ShaderResource::ReloadShaders();
-            }
+        // Execute the entire rendering pipeline
+        RenderDevice::Render(this->window, dt);
 
-            ship.Update(dt);
-            ship.CheckCollisions();
+		// transfer new frame to window
+        this->window->SwapBuffers();
 
-            // Store all drawcalls in the render device
-            for (auto const& levelPiece : testLevel) {
-                RenderDevice::Draw(std::get<0>(levelPiece), std::get<2>(levelPiece));
-            }
+        auto timeEnd = std::chrono::steady_clock::now();
+        dt = std::min(0.04, std::chrono::duration<double>(timeEnd - timeStart).count());
 
-            RenderDevice::Draw(ship.model, ship.transform);
+        if (auto cgp = Input::GetCurrentGamepad(); cgp && cgp->pressed[Input::GamepadButton::Code::BACK])
+            this->Exit();
+        if (kbd->pressed[Input::Key::Code::Escape])
+            this->Exit();
+	}
+}
 
-            // Execute the entire rendering pipeline
-            RenderDevice::Render(this->window, dt);
+//------------------------------------------------------------------------------
+/**
+*/
+void
+SpaceGameApp::Exit()
+{
+    this->window->Close();
+}
 
-		    // transfer new frame to window
-            this->window->SwapBuffers();
+//------------------------------------------------------------------------------
+/**
+*/
+void
+SpaceGameApp::RenderUI()
+{
+	if (this->window->IsOpen())
+	{
+	}
+}
 
-            auto timeEnd = std::chrono::steady_clock::now();
-            dt = std::min(0.04, std::chrono::duration<double>(timeEnd - timeStart).count());
+//------------------------------------------------------------------------------
+/**
+*/
+void
+SpaceGameApp::RenderNanoVG(NVGcontext* vg)
+{
+    nvgSave(vg);
 
-            if (auto cgp = Input::GetCurrentGamepad(); cgp && cgp->pressed[Input::GamepadButton::Code::BACK])
-                this->Exit();
-            if (kbd->pressed[Input::Key::Code::Escape])
-                this->Exit();
-	    }
-    }
+    nvgBeginPath(vg);
+    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
+    nvgStroke(vg);
+    nvgFontSize(vg, 18.0f);
+    nvgFontFace(vg, "sans");
+    nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
+    nvgText(vg, 0, 30, std::to_string(ship.rot.x).c_str(), NULL);
+    nvgText(vg, 0, 60, std::to_string(ship.rot.y).c_str(), NULL);
+    nvgText(vg, 0, 90, std::to_string(ship.rot.z).c_str(), NULL);
 
-    //------------------------------------------------------------------------------
-    /**
-    */
-    void
-    SpaceGameApp::Exit()
-    {
-        this->window->Close();
-    }
-
-    //------------------------------------------------------------------------------
-    /**
-    */
-    void
-    SpaceGameApp::RenderUI()
-    {
-	    if (this->window->IsOpen())
-	    {
-	    }
-    }
-
-    //------------------------------------------------------------------------------
-    /**
-    */
-    void
-    SpaceGameApp::RenderNanoVG(NVGcontext* vg)
-    {
-        nvgSave(vg);
-
-        nvgBeginPath(vg);
-        nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
-        nvgStroke(vg);
-        nvgFontSize(vg, 18.0f);
-        nvgFontFace(vg, "sans");
-        nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
-        nvgText(vg, 0, 30, std::to_string(ship.rot.x).c_str(), NULL);
-        nvgText(vg, 0, 60, std::to_string(ship.rot.y).c_str(), NULL);
-        nvgText(vg, 0, 90, std::to_string(ship.rot.z).c_str(), NULL);
-
-        nvgRestore(vg);
-    }
+    nvgRestore(vg);
+}
 
 } // namespace Game
