@@ -61,7 +61,7 @@ namespace Game
             0
         };
 
-        this->transform = glm::translate(this->position) * glm::rotate(rotation.x, glm::vec3(1, 0, 0)) * glm::rotate(rotation.y, glm::vec3(0, 1, 0));
+        this->transform = glm::translate(this->position) * glm::rotate(rotation.x, glm::vec3(-1.0f, 0, 0)) * glm::rotate(rotation.y, glm::vec3(0, 1.0f, 0));
 
         offset = {
             dist * cosf(rotation.x) * sinf(rotation.y),
@@ -79,17 +79,23 @@ namespace Game
     SpaceShip::CheckCollisions()
     {
         bool hit = false;
-        for (int i = 0; i < 8; i++)
+        int i = 0;
+        float part = 1.0f / colliderEndPoints.size();
+        for (const auto& it : colliderEndPoints)
         {
-            glm::vec3 pos = position;
-            glm::vec3 dir = rotation * glm::normalize(colliderEndPoints[i]);
-            float len = glm::length(colliderEndPoints[i]);
-            Physics::RaycastPayload payload = Physics::Raycast(position, dir, len);
+            float len = 1.0f;
+                
+            const glm::vec3 line = glm::vec4(it, 0.0f) * glm::rotate(-rotation.y, glm::vec3(0, 1, 0));
+            const glm::vec4 col = { 1.0f - (float)i * part, 0.0f, (float)i * part, 1.0f };
+            Debug::DrawLine(position, position + line, 2.0f, col, col);
+
+            Physics::RaycastPayload payload = Physics::Raycast(position, glm::normalize(position + line), len);
 
             if (payload.hit)
             {
                 hit = true;
             }
+            i++;
         }
         return hit;
     }

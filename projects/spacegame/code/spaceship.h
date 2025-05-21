@@ -23,7 +23,7 @@ struct SpaceShip
     const float minDist = 1.0f;
     const float maxDist = 3.0f;
     const float cameraSmoothFactor = 10.0f;
-    const float maxShootPower = 5.0f;
+    const float maxShootPower = 2.5f;
     const float shootPowerGrowSpeed = 5.0f;
     
     float shootPower = 0.0f;
@@ -35,15 +35,14 @@ struct SpaceShip
 
     bool CheckCollisions();
     
-    const glm::vec3 colliderEndPoints[8] = {
-        glm::vec3(-1.10657, -0.480347, -0.346542),  // right wing
-        glm::vec3(1.10657, -0.480347, -0.346542),  // left wing
-        glm::vec3(-0.342382, 0.25109, -0.010299),   // right top
-        glm::vec3(0.342382, 0.25109, -0.010299),   // left top
-        glm::vec3(-0.285614, -0.10917, 0.869609), // right front
-        glm::vec3(0.285614, -0.10917, 0.869609), // left front
-        glm::vec3(-0.279064, -0.10917, -0.98846),   // right back
-        glm::vec3(0.279064, -0.10917, -0.98846)   // right back
+    const std::vector<glm::vec3> colliderEndPoints = {
+        glm::vec3(1.0f, 0.0f, 0.0f),  // -90
+        glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(-60.0f), glm::vec3(0, 1, 0))),  // -60
+        glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(-30.0f), glm::vec3(0, 1, 0))),   // -30
+        glm::vec3(0.0f, 0.0f, -1.0f),   // 0
+        glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(30.0f), glm::vec3(0, 1, 0))), // 30
+        glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(60.0f), glm::vec3(0, 1, 0))), // 60
+        glm::vec3(-1.0f, 0.0f, 0.0f),   // 90
     };
 };
 
