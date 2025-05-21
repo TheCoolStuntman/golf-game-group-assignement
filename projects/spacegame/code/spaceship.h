@@ -20,13 +20,13 @@ struct SpaceShip
     glm::vec3 camPos = glm::vec3(0, 0.0f, 0.5f);
     glm::vec3 linearVelocity = glm::vec3(0);
 
-    const float maxSpeed = 2.0f;
     const float minDist = 1.0f;
     const float maxDist = 3.0f;
     const float cameraSmoothFactor = 10.0f;
-
-    float currentSpeed = 0.0f;
-
+    const float maxShootPower = 5.0f;
+    const float shootPowerGrowSpeed = 5.0f;
+    
+    float shootPower = 0.0f;
     float dist = minDist;
 
     Render::ModelId model;

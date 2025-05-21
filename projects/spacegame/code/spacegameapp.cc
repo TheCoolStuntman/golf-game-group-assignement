@@ -286,6 +286,15 @@ SpaceGameApp::RenderNanoVG(NVGcontext* vg)
 {
     nvgSave(vg);
 
+    nvgBeginPath(vg);
+    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
+    nvgStroke(vg);
+    nvgFontSize(vg, 18.0f);
+    nvgFontFace(vg, "sans");
+    nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
+
+    nvgText(vg, 0, 30, ("Shooting power: " + std::to_string(ship.shootPower)).c_str(), NULL);
+
     nvgRestore(vg);
 }
 
