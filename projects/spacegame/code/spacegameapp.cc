@@ -23,8 +23,7 @@
 #include "loader.h"
 #include <iostream>
 #include <fstream>
-
-#include <iostream>
+#include <sstream>
 
 using namespace Display;
 using namespace Render;
@@ -211,11 +210,29 @@ SpaceGameApp::Run()
         //Highscore system
         if (levelComplete) {
             //take file put in ordered list or some shit
+            std::vector<std::tuple<int, std::string>> scores;
+            std::string line;
             std::fstream highscoreFile(highscorePath[cl]);
 
+            int i;
+            while (std::getline(highscoreFile, line)) {
+                std::vector<std::string> scoreParts;
+                std::istringstream inputString(line);
+                std::string token;
+                while (inputString >> token) {
+                    scoreParts.push_back(token);
+                }  
+                
+                
+
+                ++i;
+            }
             //add new score
             //Write again
+            
             //Reset position and strokes
+            strokes = 0;
+            levelComplete = false;
         }
 
         //Is probably a better way to do this but didn't want to send the entire map every tick to a function 
