@@ -13,21 +13,21 @@ struct SpaceShip
 {
     SpaceShip();
     
-    glm::vec3 position = glm::vec3(0);
-    glm::vec3 camPos = glm::vec3(0, 0.0f, 0.5f);
     glm::mat4 transform = glm::mat4(1);
+    glm::vec3 position = glm::vec3(0);
+    glm::vec3 rotation = glm::vec3(0);
+    glm::vec3 offset = glm::vec3(0);
+    glm::vec3 camPos = glm::vec3(0, 0.0f, 0.5f);
     glm::vec3 linearVelocity = glm::vec3(0);
 
     const float maxSpeed = 2.0f;
-    const float minOffsetZ = 1.0f;
-    const float maxOffsetZ = 3.0f;
+    const float minDist = 1.0f;
+    const float maxDist = 3.0f;
     const float cameraSmoothFactor = 10.0f;
 
     float currentSpeed = 0.0f;
 
-    glm::vec3 rot;
-
-    float offsetZ = minOffsetZ;
+    float dist = minDist;
 
     Render::ModelId model;
 

@@ -217,16 +217,6 @@ SpaceGameApp::RenderNanoVG(NVGcontext* vg)
 {
     nvgSave(vg);
 
-    nvgBeginPath(vg);
-    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
-    nvgStroke(vg);
-    nvgFontSize(vg, 18.0f);
-    nvgFontFace(vg, "sans");
-    nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
-    nvgText(vg, 0, 30, std::to_string(ship.rot.x).c_str(), NULL);
-    nvgText(vg, 0, 60, std::to_string(ship.rot.y).c_str(), NULL);
-    nvgText(vg, 0, 90, std::to_string(ship.rot.z).c_str(), NULL);
-
     nvgRestore(vg);
 }
 
