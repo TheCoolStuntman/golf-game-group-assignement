@@ -93,12 +93,45 @@ SpaceGameApp::Run()
     Camera* cam = CameraManager::GetCamera(CAMERA_MAIN);
     cam->projection = projection;
 
+    ModelId golfModels[14] = {
+        LoadModel("assets/golf/open.glb"),
+        LoadModel("assets/golf/side.glb"),
+        LoadModel("assets/golf/corner.glb"),
+        LoadModel("assets/golf/square-corner-a.glb"),
+        LoadModel("assets/golf/round-corner-c.glb"),
+        LoadModel("assets/golf/round-corner-a.glb"),
+        LoadModel("assets/golf/round-corner-b.glb"),
+        LoadModel("assets/golf/inner-corner.glb"),
+        LoadModel("assets/golf/straight.glb"),
+        LoadModel("assets/golf/walls-to-open.glb"),
+        LoadModel("assets/golf/end.glb"),
+        LoadModel("assets/golf/hole-open.glb"),
+        LoadModel("assets/golf/hole-square.glb"),
+        LoadModel("assets/golf/flag-red.glb")
+    };
+
+    Physics::ColliderMeshId golfColliderMeshes[14] = {
+        Physics::LoadColliderMesh("assets/golf/open.glb"),
+        Physics::LoadColliderMesh("assets/golf/side.glb"),
+        Physics::LoadColliderMesh("assets/golf/corner.glb"),
+        Physics::LoadColliderMesh("assets/golf/square-corner-a.glb"),
+        Physics::LoadColliderMesh("assets/golf/round-corner-c.glb"),
+        Physics::LoadColliderMesh("assets/golf/round-corner-a.glb"),
+        Physics::LoadColliderMesh("assets/golf/round-corner-b.glb"),
+        Physics::LoadColliderMesh("assets/golf/inner-corner.glb"),
+        Physics::LoadColliderMesh("assets/golf/straight.glb"),
+        Physics::LoadColliderMesh("assets/golf/walls-to-open.glb"),
+        Physics::LoadColliderMesh("assets/golf/end.glb"),
+        Physics::LoadColliderMesh("assets/golf/hole-open.glb"),
+        Physics::LoadColliderMesh("assets/golf/hole-square.glb"),
+        Physics::LoadColliderMesh("assets/golf/flag-red.glb")
+    };
     
     //Set up level array and load level 1
     std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> levelArray;
     std::vector<std::string> levelPath = { "levels/level-1.txt", "levels/level-2.txt", "levels/level-3.txt" };
     int cl = 0; //curren Level
-    levelLoader::loadLevel(levelPath[cl], levelArray);
+    levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
 
     //Score variables
     int strokes = 0;
@@ -111,7 +144,7 @@ SpaceGameApp::Run()
             Input::CreateGamepad(i);
         }
     }
-
+    
     // Setup skybox
     std::vector<const char*> skybox
     {
@@ -125,8 +158,7 @@ SpaceGameApp::Run()
 
     TextureResourceId skyboxId = TextureResource::LoadCubemap("skybox", skybox, true);
     RenderDevice::SetSkybox(skyboxId);
-    
-    Input::Keyboard* kbd = Input::GetDefaultKeyboard();
+   
 
     const int numLights = 4;
     Render::PointLightId lights[numLights];
@@ -165,6 +197,9 @@ SpaceGameApp::Run()
         if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr)
             cgp->Update();
 
+        Input::Keyboard* kbd = Input::GetDefaultKeyboard();
+        Input::Gamepad* gpd = Input::GetCurrentGamepad();
+
         if (kbd->pressed[Input::Key::Code::End])
         {
             ShaderResource::ReloadShaders();
@@ -184,12 +219,20 @@ SpaceGameApp::Run()
         }
 
         //Is probably a better way to do this but didn't want to send the entire map every tick to a function 
-        Input::Gamepad* gpd = Input::GetCurrentGamepad();
-        if (gpd->pressed[Input::GamepadButton::X]) {
-            ++cl %= 3;
-            levelArray.clear();
-            levelLoader::loadLevel(levelPath[cl], levelArray);
+        if (auto cgp = Input::GetCurrentGamepad(); cgp == nullptr) {
+            if (kbd->pressed[Input::Key::K]) {
+                ++cl %= 3;
+                levelArray.clear();
+                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+            }
+        } else {
+            if (gpd->pressed[Input::GamepadButton::X]) {
+                ++cl %= 3;
+                levelArray.clear();
+                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+            }
         }
+        
 
         // Store all drawcalls in the render device
         for (auto const& levelPiece : levelArray) {

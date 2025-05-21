@@ -23,42 +23,10 @@ namespace levelLoader {
 		return tokens;
 	}
 
-	void loadLevel(std::string levelName, std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>>& levelArray)
+	void loadLevel(std::string levelName, std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>>& levelArray, ModelId golfModels[14], Physics::ColliderMeshId golfColliderMeshes[14])
 	{
 
-		ModelId golfModels[14] = {
-			LoadModel("assets/golf/open.glb"),
-			LoadModel("assets/golf/side.glb"),        
-			LoadModel("assets/golf/corner.glb"),
-			LoadModel("assets/golf/square-corner-a.glb"),
-			LoadModel("assets/golf/round-corner-c.glb"),
-			LoadModel("assets/golf/round-corner-a.glb"),
-			LoadModel("assets/golf/round-corner-b.glb"),
-			LoadModel("assets/golf/inner-corner.glb"),
-			LoadModel("assets/golf/straight.glb"),
-			LoadModel("assets/golf/walls-to-open.glb"),
-			LoadModel("assets/golf/end.glb"),
-			LoadModel("assets/golf/hole-open.glb"),
-			LoadModel("assets/golf/hole-square.glb"),
-			LoadModel("assets/golf/flag-red.glb")
-		};
-
-		Physics::ColliderMeshId golfColliderMeshes[14] = {
-			Physics::LoadColliderMesh("assets/golf/open.glb"),
-			Physics::LoadColliderMesh("assets/golf/side.glb"),
-			Physics::LoadColliderMesh("assets/golf/corner.glb"),
-			Physics::LoadColliderMesh("assets/golf/square-corner-a.glb"),
-			Physics::LoadColliderMesh("assets/golf/round-corner-c.glb"),
-			Physics::LoadColliderMesh("assets/golf/round-corner-a.glb"),
-			Physics::LoadColliderMesh("assets/golf/round-corner-b.glb"),
-			Physics::LoadColliderMesh("assets/golf/inner-corner.glb"),
-			Physics::LoadColliderMesh("assets/golf/straight.glb"),
-			Physics::LoadColliderMesh("assets/golf/walls-to-open.glb"),
-			Physics::LoadColliderMesh("assets/golf/end.glb"),
-			Physics::LoadColliderMesh("assets/golf/hole-open.glb"),
-			Physics::LoadColliderMesh("assets/golf/hole-square.glb"),
-			Physics::LoadColliderMesh("assets/golf/flag-red.glb")
-		};
+		
 
 		std::tuple<ModelId, Physics::ColliderId, glm::mat4> levelPiece;
 
@@ -89,5 +57,7 @@ namespace levelLoader {
 		}
 
 		inputFile.close();
+
+
 	}
 }
