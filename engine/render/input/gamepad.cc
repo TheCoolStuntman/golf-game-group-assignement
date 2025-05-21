@@ -31,23 +31,23 @@ namespace Input {
             axis[i] = tmp_axis[i];
         }
 
+        for (int i = 0; i < pressed.size(); ++i) {
+            if (released[i]) {
+                held[i] = false;
+            }
+            pressed[i] = false;
+            released[i] = false;
+        }
+
         int buttons_c;
         const unsigned char* tmp_btns = glfwGetJoystickButtons(id, &buttons_c);
         for (int i = 0; i < buttons_c && i < pressed.size(); ++i) {
-            if (pressed[i] && tmp_btns[i]) {
+            if (tmp_btns[i]) {
+                pressed[i] = held[i] ? false : true;
                 held[i] = true;
             }
             else {
-                held[i] = false;
-            }
-
-            if (tmp_btns[i]) {
-                pressed[i] = true;
-                released[i] = false;
-            }
-            else {
-                pressed[i] = false;
-                released[i] = true;
+                released[i] = held[i] ? true : false;
             }
         }
     }
