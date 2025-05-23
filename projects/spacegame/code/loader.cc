@@ -3,11 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 
 using namespace Render;
 
-namespace levelLoader {
+namespace loader {
 
 	std::vector<std::string> splitString(const std::string& input)
 	{
@@ -35,7 +36,7 @@ namespace levelLoader {
 
 		while (std::getline(inputFile, tile)) {
 			std::vector<std::string> tileInfo = splitString(tile);
-			
+
 			if (stoi(tileInfo[0]) == -1) {
 				//Do startpos shit
 				continue;
@@ -55,3 +56,4 @@ namespace levelLoader {
 		inputFile.close();
 	}
 }
+

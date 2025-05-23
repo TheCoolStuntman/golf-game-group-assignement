@@ -22,6 +22,7 @@
 #include "loader.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 using namespace Display;
 using namespace Render;
@@ -130,9 +131,8 @@ SpaceGameApp::Run()
     levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
 
     //Score variables
-    int strokes = 0;
     bool levelComplete = false;
-    std::vector<std::string> highscorePath = { "highscores/highscore-level-1.txt", "highscores/highscore-level-2.txt", "highscores/highscore-level-3.txt" };
+    int strokes = 0;
 
     for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
         //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
@@ -208,12 +208,30 @@ SpaceGameApp::Run()
         
         //Highscore system
         if (levelComplete) {
-            //take file put in ordered list or some shit
-            std::fstream highscoreFile(highscorePath[cl]);
+            std::string line;
+            std::ifstream inputFile("levels/highscores.txt");
+            if (!inputFile) throw(std::exception("no highscore file found"));
 
-            //add new score
-            //Write again
-            //Reset position and strokes
+            std::vector<std::string> scores;
+            for (int i = 0; std::getline(inputFile, line); i++) {
+                if (i == cl && stoi(line) > strokes) {
+                    scores.push_back(std::to_string(strokes));
+                    continue;
+                }
+                scores.push_back(line);
+            }
+            inputFile.close();
+            
+            std::ofstream outputFile("levels/highscores.txt");
+            if (!outputFile) throw(std::exception("no highscore file found"));
+
+            for (std::string line : scores) {
+                outputFile << line << "\n";
+            }
+            outputFile.close();
+
+            strokes = 0;
+            levelComplete = false;
         }
 
         //Is probably a better way to do this but didn't want to send the entire map every tick to a function 
