@@ -9,6 +9,7 @@
 #include "debugrender.h"
 #include "core/random.h"
 #include "core/cvar.h"
+#include "core/level.h"
 #include <iostream>
 namespace Physics
 {
@@ -531,14 +532,15 @@ SetTransform(ColliderId collider, glm::mat4 const& transform)
     Cast ray from start point in direction. Make sure the direction is a unit vector.
 */
 RaycastPayload
-Raycast(glm::vec3 start, glm::vec3 dir, float maxDistance, uint16_t mask)
+Raycast(const Level::Level& level, glm::vec3 start, glm::vec3 dir, float maxDistance, uint16_t mask)
 {
     RaycastPayload ret;
     ret.hitDistance = maxDistance;
     // TODO: spatial acceleration instead of just checking everything...
     int numColliders = (int)colliders.active.size();
-    for (int colliderIndex = 0; colliderIndex < numColliders; colliderIndex++)
+    for (const auto& tile : level.tiles)
     {
+        int colliderIndex = tile.collider.index;
         if (colliders.active[colliderIndex] && (mask == 0 || (colliders.masks[colliderIndex] & mask) != 0))
         {
             ColliderMesh const* const mesh = &meshes[colliders.meshes[colliderIndex].index];
@@ -634,6 +636,8 @@ Raycast(glm::vec3 start, glm::vec3 dir, float maxDistance, uint16_t mask)
     {
         //calculate hitpoint
         ret.hitPoint = start + dir * ret.hitDistance;
+        const auto t = glm::inverse(colliders.invTransforms[ret.collider.index]);
+        ret.hitNormal = glm::normalize(t * glm::vec4(-ret.hitNormal, 0.0f));
     }
 
     return ret;
@@ -645,6 +649,7 @@ void DebugDrawColliders()
     for (int colliderIndex = 0; colliderIndex < numColliders; colliderIndex++)
     {
         ColliderMesh const* const mesh = &meshes[colliders.meshes[colliderIndex].index];
+        if (!colliders.active[colliderIndex]) continue;
         glm::mat4 t = glm::inverse(colliders.invTransforms[colliderIndex]);
         size_t numTris = mesh->tris.size();
         for (size_t k = 0; k < numTris; k++)

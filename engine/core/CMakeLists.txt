@@ -13,6 +13,7 @@ SET(files_core
 	cvar.cc
 	idpool.h
 	math.h
+	level.h
 	)
 SOURCE_GROUP("core" FILES ${files_core})
 	

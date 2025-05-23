@@ -33,7 +33,7 @@ namespace Game
                 shootPower = Math::max(shootPower + shootPowerGrowSpeed * dt, maxShootPower);
             }
             if (kbd->released[Key::Space]) {
-                this->linearVelocity = shootPower * glm::vec4(0, 0, -1.0f, 0.0f) * glm::rotate(-rotation.y, glm::vec3(0, 1, 0));
+                this->linearVelocity = shootPower * glm::vec4(0, 0, -1.0f, 0.0f) * glm::rotate(-camRot.y, glm::vec3(0, 1, 0));
                 shootPower = 0.0f;
             }
         }
@@ -45,7 +45,7 @@ namespace Game
                 shootPower = Math::max(shootPower + shootPowerGrowSpeed * dt, maxShootPower);
             }
             if (gpd->released[Input::GamepadButton::A]) {
-                this->linearVelocity = shootPower * glm::vec4(0, 0, -1.0f, 0.0f) * glm::rotate(-rotation.y, glm::vec3(0, 1, 0));
+                this->linearVelocity = shootPower * glm::vec4(0, 0, -1.0f, 0.0f) * glm::rotate(-camRot.y, glm::vec3(0, 1, 0));
                 shootPower = 0.0f;
             }
         }
@@ -53,20 +53,21 @@ namespace Game
 
         this->position += this->linearVelocity * dt;
         this->linearVelocity *= 0.98f;
+        Debug::DrawLine(position, position + linearVelocity, 0.2f, glm::vec4(1, 1, 0, 1), glm::vec4(1, 1, 0, 1));
 
         const float rotationSpeed = 1.8f;
-        rotation = {
-            rotation.x + rotX * rotationSpeed * dt,
-            rotation.y + rotY * rotationSpeed * dt,
+        camRot = {
+            camRot.x + rotX * rotationSpeed * dt,
+            camRot.y + rotY * rotationSpeed * dt,
             0
         };
 
-        this->transform = glm::translate(this->position) * glm::rotate(rotation.x, glm::vec3(-1.0f, 0, 0)) * glm::rotate(rotation.y, glm::vec3(0, 1.0f, 0));
+        this->transform = glm::translate(this->position) * glm::rotate(camRot.x, glm::vec3(-1.0f, 0, 0)) * glm::rotate(camRot.y, glm::vec3(0, 1.0f, 0));
 
         offset = {
-            dist * cosf(rotation.x) * sinf(rotation.y),
-            dist * sinf(rotation.x),
-            dist * cosf(rotation.x)* cosf(rotation.y)
+            dist * cosf(camRot.x) * sinf(camRot.y),
+            dist * sinf(camRot.x),
+            dist * cosf(camRot.x)* cosf(camRot.y)
         };
 
         this->camPos = this->position + offset;
@@ -76,27 +77,38 @@ namespace Game
     }
 
     bool
-    SpaceShip::CheckCollisions()
+    SpaceShip::CheckCollisions(const Level::Level& level)
     {
-        bool hit = false;
-        int i = 0;
-        float part = 1.0f / colliderEndPoints.size();
+        Physics::RaycastPayload closest;
+        closest.hitDistance = FLT_MAX;
+
         for (const auto& it : colliderEndPoints)
         {
-            float len = 1.0f;
-                
-            const glm::vec3 line = glm::vec4(it, 0.0f) * glm::rotate(-rotation.y, glm::vec3(0, 1, 0));
-            const glm::vec4 col = { 1.0f - (float)i * part, 0.0f, (float)i * part, 1.0f };
-            Debug::DrawLine(position, position + line, 2.0f, col, col);
+            float len = glm::length(it);  
+            const glm::vec3& dir = it;
+            const glm::vec4 col = { 0.0f, 1.0f, 1.0f, 1.0f };
+            Debug::DrawLine(position, position + dir * len, 0.2f, col, col);
 
-            Physics::RaycastPayload payload = Physics::Raycast(position, glm::normalize(position + line), len);
+            Physics::RaycastPayload payload = Physics::Raycast(level, position, dir, len);
 
-            if (payload.hit)
+            if (payload.hit && payload.hitDistance < 0.04f)
             {
-                hit = true;
+                //if (glm::dot(payload.hitNormal, linearVelocity) < 0.0f) payload.hitNormal *= -1.0f;
+                
+                Debug::DrawLine(payload.hitPoint, payload.hitPoint + payload.hitNormal, 2.0f, glm::vec4(1, 0, 1, 1), glm::vec4(1, 0, 1, 1));
+                
+                if (payload.hitDistance < closest.hitDistance) {
+                    closest = std::move(payload);
+                }
             }
-            i++;
         }
-        return hit;
+
+        if (closest.hit) {
+            linearVelocity = glm::reflect(linearVelocity, closest.hitNormal) * 0.8f;
+            linearVelocity.y = 0;
+            position += closest.hitNormal * 0.02f;
+            return true;
+        }
+        return false;
     }
 }

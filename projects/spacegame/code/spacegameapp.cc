@@ -23,8 +23,6 @@
 #include <iostream>
 #include <fstream>
 
-#include <iostream>
-
 using namespace Display;
 using namespace Render;
 
@@ -127,10 +125,9 @@ SpaceGameApp::Run()
     };
     
     //Set up level array and load level 1
-    std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> levelArray;
     std::vector<std::string> levelPath = { "levels/level-1.txt", "levels/level-2.txt", "levels/level-3.txt" };
     int cl = 0; //curren Level
-    levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+    levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
 
     //Score variables
     int strokes = 0;
@@ -179,7 +176,7 @@ SpaceGameApp::Run()
 
     ship.model = LoadModel("assets/golf/ball-blue.glb");
     ship.position.y = 1.0f;
-    Physics::RaycastPayload hit = Physics::Raycast(glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
+    Physics::RaycastPayload hit = Physics::Raycast(level, glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
     ship.position.y -= hit.hitDistance;
 
     std::clock_t c_start = std::clock();
@@ -207,7 +204,7 @@ SpaceGameApp::Run()
         }
 
         ship.Update(dt);
-        ship.CheckCollisions();
+        ship.CheckCollisions(level);
         
         //Highscore system
         if (levelComplete) {
@@ -223,27 +220,28 @@ SpaceGameApp::Run()
         if (auto cgp = Input::GetCurrentGamepad(); cgp == nullptr) {
             if (kbd->pressed[Input::Key::K]) {
                 ++cl %= 3;
-                levelArray.clear();
-                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+                level.tiles.clear();
+                levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
             }
         } else {
             if (gpd->pressed[Input::GamepadButton::X]) {
                 ++cl %= 3;
-                levelArray.clear();
-                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+                level.tiles.clear();
+                levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
             }
         }
         
 
         // Store all drawcalls in the render device
-        for (auto const& levelPiece : levelArray) {
-            RenderDevice::Draw(std::get<0>(levelPiece), std::get<2>(levelPiece));
+        for (auto const& tile : level.tiles) {
+            RenderDevice::Draw(tile.model, tile.transform);
         }
 
         RenderDevice::Draw(ship.model, ship.transform);
 
         // Execute the entire rendering pipeline
         RenderDevice::Render(this->window, dt);
+        //Physics::DebugDrawColliders();
 
 		// transfer new frame to window
         this->window->SwapBuffers();

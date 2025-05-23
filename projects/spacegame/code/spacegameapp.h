@@ -9,6 +9,7 @@
 #include "core/app.h"
 #include "render/window.h"
 #include "spaceship.h"
+#include "core/level.h"
 
 namespace Game
 {
@@ -36,5 +37,6 @@ private:
 	Display::Window* window;
 
 	SpaceShip ship;
+	Level::Level level;
 };
 } // namespace Game

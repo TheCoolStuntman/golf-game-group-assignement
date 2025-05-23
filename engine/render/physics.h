@@ -9,6 +9,10 @@
 //------------------------------------------------------------------------------
 #include <string>
 
+namespace Level {
+    struct Level;
+}
+
 namespace Physics
 {
     
@@ -88,7 +92,7 @@ struct RaycastPayload
     ColliderId collider;
 };
 
-RaycastPayload Raycast(glm::vec3 start, glm::vec3 dir, float maxDistance, uint16_t mask = 0);
+RaycastPayload Raycast(const Level::Level& level, glm::vec3 start, glm::vec3 dir, float maxDistance, uint16_t mask = 0);
 
 ColliderId CreateCollider(ColliderMeshId meshId, glm::mat4 const& transform, uint16_t mask = 0, void* userData = nullptr);
 
@@ -99,5 +103,6 @@ void SetTransform(ColliderId collider, glm::mat4 const& transform);
 // temp
 void SetupBVH();
 void VisualizeBVH();
+void DebugDrawColliders();
 
 } // namespace Physics
