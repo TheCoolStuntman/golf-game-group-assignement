@@ -3,11 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 
 using namespace Render;
 
-namespace levelLoader {
+namespace loader {
 
 	std::vector<std::string> splitString(const std::string& input)
 	{
@@ -37,7 +38,7 @@ namespace levelLoader {
 
 		while (std::getline(inputFile, tile)) {
 			std::vector<std::string> tileInfo = splitString(tile);
-			
+
 			if (stoi(tileInfo[0]) == -1) {
 				//Do startpos shit
 				continue;
@@ -45,16 +46,15 @@ namespace levelLoader {
 
 			std::get<0>(levelPiece) = golfModels[stoi(tileInfo[0])];
 			glm::vec3 translation = glm::vec3(stoi(tileInfo[1]), stoi(tileInfo[2]), stoi(tileInfo[3]));
-			
+
 			float rotation = glm::radians(stof(tileInfo[4]));
 			glm::mat4 transform = glm::translate(translation) * glm::rotate(rotation, glm::vec3(0, 1, 0));
-			std::get<1>(levelPiece) = Physics::CreateCollider(golfColliderMeshes[0], transform);
+			std::get<1>(levelPiece) = Physics::CreateCollider(golfColliderMeshes[stoi(tileInfo[0])], transform);
 			std::get<2 >(levelPiece) = transform;
 			levelArray.push_back(levelPiece);
 		}
 
 		inputFile.close();
-
-
 	}
 }
+

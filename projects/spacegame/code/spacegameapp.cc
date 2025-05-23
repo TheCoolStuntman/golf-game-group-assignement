@@ -130,12 +130,11 @@ SpaceGameApp::Run()
     std::vector<std::tuple<ModelId, Physics::ColliderId, glm::mat4>> levelArray;
     std::vector<std::string> levelPath = { "levels/level-1.txt", "levels/level-2.txt", "levels/level-3.txt" };
     int cl = 0; //curren Level
-    levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+    loader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
 
     //Score variables
-    int strokes = 0;
     bool levelComplete = false;
-    std::vector<std::string> highscorePath = { "highscores/highscore-level-1.txt", "highscores/highscore-level-2.txt", "highscores/highscore-level-3.txt" };
+    int strokes = 0;
 
     for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
         //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
@@ -209,28 +208,28 @@ SpaceGameApp::Run()
         
         //Highscore system
         if (levelComplete) {
-            //take file put in ordered list or some shit
-            std::vector<std::tuple<int, std::string>> scores;
             std::string line;
-            std::fstream highscoreFile(highscorePath[cl]);
+            std::ifstream inputFile("levels/highscores.txt");
+            if (!inputFile) throw(std::exception("no highscore file found"));
 
-            int i;
-            while (std::getline(highscoreFile, line)) {
-                std::vector<std::string> scoreParts;
-                std::istringstream inputString(line);
-                std::string token;
-                while (inputString >> token) {
-                    scoreParts.push_back(token);
-                }  
-                
-                
-
-                ++i;
+            std::vector<std::string> scores;
+            for (int i = 0; std::getline(inputFile, line); i++) {
+                if (i == cl && stoi(line) > strokes) {
+                    scores.push_back(std::to_string(strokes));
+                    continue;
+                }
+                scores.push_back(line);
             }
-            //add new score
-            //Write again
+            inputFile.close();
             
-            //Reset position and strokes
+            std::ofstream outputFile("levels/highscores.txt");
+            if (!outputFile) throw(std::exception("no highscore file found"));
+
+            for (std::string line : scores) {
+                outputFile << line << "\n";
+            }
+            outputFile.close();
+
             strokes = 0;
             levelComplete = false;
         }
@@ -240,13 +239,13 @@ SpaceGameApp::Run()
             if (kbd->pressed[Input::Key::K]) {
                 ++cl %= 3;
                 levelArray.clear();
-                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+                loader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
             }
         } else {
             if (gpd->pressed[Input::GamepadButton::X]) {
                 ++cl %= 3;
                 levelArray.clear();
-                levelLoader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
+                loader::loadLevel(levelPath[cl], levelArray, golfModels, golfColliderMeshes);
             }
         }
         

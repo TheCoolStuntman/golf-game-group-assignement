@@ -18,3 +18,8 @@ Every line is a tile separate by spaces ' '
 first is tile type
 second to fourth is xyz
 fifth is rotation in degrees rotation, counter clockwise
+
+highscore is for all three levels, lowest score recorded on each level is saved.
+level 1 is on the first line
+level 2 is on the second line
+level 3 is on the third line
