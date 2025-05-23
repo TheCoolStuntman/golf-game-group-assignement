@@ -128,11 +128,7 @@ SpaceGameApp::Run()
     //Set up level array and load level 1
     std::vector<std::string> levelPath = { "levels/level-1.txt", "levels/level-2.txt", "levels/level-3.txt" };
     int cl = 0; //curren Level
-    levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
-
-    //Score variables
-    bool levelComplete = false;
-    int strokes = 0;
+    Physics::ColliderId flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
 
     for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i) {
         //std::cout << i << (glfwJoystickPresent(i) ? " true" : " false") << '\n';
@@ -204,18 +200,17 @@ SpaceGameApp::Run()
         }
 
         ship.Update(dt);
-        ship.CheckCollisions(level);
-        
+                
         //Highscore system
-        if (levelComplete) {
+        if (ship.CheckCollisions(level, flagColliderId)) {
             std::string line;
             std::ifstream inputFile("levels/highscores.txt");
             if (!inputFile) throw(std::exception("no highscore file found"));
 
             std::vector<std::string> scores;
             for (int i = 0; std::getline(inputFile, line); i++) {
-                if (i == cl && stoi(line) > strokes) {
-                    scores.push_back(std::to_string(strokes));
+                if (i == cl && stoi(line) > ship.strokes) {
+                    scores.push_back(std::to_string(ship.strokes));
                     continue;
                 }
                 scores.push_back(line);
@@ -230,8 +225,17 @@ SpaceGameApp::Run()
             }
             outputFile.close();
 
-            strokes = 0;
-            levelComplete = false;
+
+            ship.position = { 0, 0, 0 };
+            ship.linearVelocity = { 0, 0, 0 };
+            ship.camRot = { 0, 0, 0, };
+            ship.position.y = 1.0f;
+            Physics::RaycastPayload hit = Physics::Raycast(level, glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
+            ship.position.y -= hit.hitDistance;
+            ship.strokes = 0;
+            ++cl %= 3;
+            level.tiles.clear();
+            flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
         }
 
         //Is probably a better way to do this but didn't want to send the entire map every tick to a function 
@@ -239,13 +243,13 @@ SpaceGameApp::Run()
             if (kbd->pressed[Input::Key::K]) {
                 ++cl %= 3;
                 level.tiles.clear();
-                levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
+                flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
             }
         } else {
             if (gpd->pressed[Input::GamepadButton::X]) {
                 ++cl %= 3;
                 level.tiles.clear();
-                levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
+                flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
             }
         }
         

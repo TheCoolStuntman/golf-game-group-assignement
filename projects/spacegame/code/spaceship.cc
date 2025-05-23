@@ -35,6 +35,7 @@ namespace Game
             if (kbd->released[Key::Space]) {
                 this->linearVelocity = shootPower * glm::vec4(0, 0, -1.0f, 0.0f) * glm::rotate(-camRot.y, glm::vec3(0, 1, 0));
                 shootPower = 0.0f;
+                strokes++;
             }
         }
         else {
@@ -47,6 +48,7 @@ namespace Game
             if (gpd->released[Input::GamepadButton::A]) {
                 this->linearVelocity = shootPower * glm::vec4(0, 0, -1.0f, 0.0f) * glm::rotate(-camRot.y, glm::vec3(0, 1, 0));
                 shootPower = 0.0f;
+                strokes++;
             }
         }
         dist = Math::clamp(dist, minDist, maxDist);
@@ -77,7 +79,7 @@ namespace Game
     }
 
     bool
-    SpaceShip::CheckCollisions(const Level::Level& level)
+    SpaceShip::CheckCollisions(const Level::Level& level, Physics::ColliderId flagColliderId)
     {
         Physics::RaycastPayload closest;
         closest.hitDistance = FLT_MAX;
@@ -107,7 +109,9 @@ namespace Game
             linearVelocity = glm::reflect(linearVelocity, closest.hitNormal) * 0.8f;
             linearVelocity.y = 0;
             position += closest.hitNormal * 0.02f;
-            return true;
+            if (closest.collider == flagColliderId) {
+                return true;
+            }
         }
         return false;
     }

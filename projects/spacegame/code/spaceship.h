@@ -30,11 +30,13 @@ struct SpaceShip
     float shootPower = 0.0f;
     float dist = minDist;
 
+    int strokes = 0;
+
     Render::ModelId model;
 
     void Update(float dt);
 
-    bool CheckCollisions(const Level::Level& level);
+    bool CheckCollisions(const Level::Level& level, Physics::ColliderId flagColliderId);
     
     const std::vector<glm::vec3> colliderEndPoints = {
         glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(-160.0f), glm::vec3(0, 1, 0)))),
