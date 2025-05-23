@@ -4,7 +4,10 @@
 
 #include "render/model.h"
 #include "render/physics.h"
-#include "core/level.h"
+
+namespace Level {
+	struct Level;
+}
 
 using namespace Render;
 

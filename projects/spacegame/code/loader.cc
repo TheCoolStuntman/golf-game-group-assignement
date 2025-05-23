@@ -4,11 +4,12 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include "core/level.h"
 
 
 using namespace Render;
 
-namespace loader {
+namespace levelLoader {
 
 	std::vector<std::string> splitString(const std::string& input)
 	{
