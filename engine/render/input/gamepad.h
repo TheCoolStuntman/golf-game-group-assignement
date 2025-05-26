@@ -35,9 +35,9 @@ namespace Input {
         enum Code {
             LEFT_STICK_X = 0,
             LEFT_STICK_Y,
+            LEFT_TRIGGER,
             RIGHT_STICK_X,
             RIGHT_STICK_Y,
-            LEFT_TRIGGER,
             RIGHT_TRIGGER,
             NUMGamepadAxis,
         };
