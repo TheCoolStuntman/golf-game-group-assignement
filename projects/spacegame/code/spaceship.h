@@ -24,7 +24,7 @@ struct SpaceShip
     const float minDist = 1.0f;
     const float maxDist = 3.0f;
     const float cameraSmoothFactor = 10.0f;
-    const float maxShootPower = 4.0f;
+    const float maxShootPower = 2.0f;
     const float shootPowerGrowSpeed = 10.0f;
     
     float shootPower = 0.0f;

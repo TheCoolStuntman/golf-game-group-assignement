@@ -56,7 +56,7 @@ namespace Game
         this->position += this->linearVelocity * dt;
         this->linearVelocity *= 0.98f;
         glm::vec3 lookDir = glm::vec4(0, 0, -1, 0) * glm::rotate(-camRot.y, glm::vec3(0, 1, 0));
-        Debug::DrawLine(position, position + lookDir * shootPower * 0.1f, 0.2f, glm::vec4(1, 1, 0, 1), glm::vec4(1, 1, 0, 1));
+        Debug::DrawLine(position, position + lookDir * shootPower * 0.2f, 0.2f, glm::vec4(1, 1, 0, 1), glm::vec4(1, 1, 0, 1));
 
         const float rotationSpeed = 1.8f;
         camRot = {
