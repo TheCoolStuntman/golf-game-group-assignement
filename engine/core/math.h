@@ -12,6 +12,12 @@ namespace Math {
 
 	template <typename T>
 	requires std::is_integral_v<T> || std::is_floating_point_v<T>
+	inline T outside(T v, T r) {
+		return v > -r ? (v < r ? 0.0f : v) : v;
+	}
+
+	template <typename T>
+	requires std::is_integral_v<T> || std::is_floating_point_v<T>
 	inline T max(T v, T max) {
 		return v > max ? max : v;
 	}

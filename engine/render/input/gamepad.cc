@@ -5,6 +5,8 @@
 #include "config.h"
 #include "gamepad.h"
 
+#include "core/math.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Input {
@@ -28,7 +30,7 @@ namespace Input {
         int axis_c;
         const float* tmp_axis = glfwGetJoystickAxes(id, &axis_c);
         for (int i = 0; i < axis_c && i < axis.size(); ++i) {
-            axis[i] = tmp_axis[i];
+            axis[i] = Math::outside(tmp_axis[i], DeadZone);
         }
 
         for (int i = 0; i < pressed.size(); ++i) {

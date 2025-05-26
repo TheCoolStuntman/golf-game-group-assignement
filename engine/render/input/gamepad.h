@@ -9,6 +9,8 @@
 //------------------------------------------------------------------------------
 #include <vector>
 
+
+
 namespace Input {
 
     struct GamepadButton {
@@ -49,6 +51,8 @@ namespace Input {
         std::vector<bool> pressed;
         std::vector<bool> held;
         std::vector<bool> released;
+
+        float DeadZone = 0.1f;
 
         Gamepad(int id);
         ~Gamepad();
