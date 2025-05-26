@@ -205,7 +205,10 @@ SpaceGameApp::Run()
         if (ship.CheckCollisions(level, flagColliderId)) {
             std::string line;
             std::ifstream inputFile("levels/highscores.txt");
-            if (!inputFile) throw(std::exception("no highscore file found"));
+            if (!inputFile) {
+                this->Close();
+                break;
+            }
 
             std::vector<std::string> scores;
             for (int i = 0; std::getline(inputFile, line); i++) {
@@ -218,7 +221,10 @@ SpaceGameApp::Run()
             inputFile.close();
 
             std::ofstream outputFile("levels/highscores.txt");
-            if (!outputFile) throw(std::exception("no highscore file found"));
+            if (!outputFile) {
+                this->Close();
+                break;
+            }
 
             for (std::string line : scores) {
                 outputFile << line << "\n";

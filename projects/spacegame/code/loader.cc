@@ -30,7 +30,7 @@ namespace levelLoader {
 		std::ifstream inputFile(levelName);
 
 		if (!inputFile) {
-			throw(std::exception("no level file found"));
+			return Physics::ColliderId::Invalid();
 		}
 
 		std::string tile;
