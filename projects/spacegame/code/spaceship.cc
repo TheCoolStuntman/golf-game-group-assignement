@@ -55,7 +55,8 @@ namespace Game
 
         this->position += this->linearVelocity * dt;
         this->linearVelocity *= 0.98f;
-        Debug::DrawLine(position, position + linearVelocity, 0.2f, glm::vec4(1, 1, 0, 1), glm::vec4(1, 1, 0, 1));
+        glm::vec3 lookDir = glm::vec4(0, 0, -1, 0) * glm::rotate(-camRot.y, glm::vec3(0, 1, 0));
+        Debug::DrawLine(position, position + lookDir * shootPower * 0.1f, 0.2f, glm::vec4(1, 1, 0, 1), glm::vec4(1, 1, 0, 1));
 
         const float rotationSpeed = 1.8f;
         camRot = {
@@ -89,7 +90,7 @@ namespace Game
             float len = glm::length(it);  
             const glm::vec3& dir = it;
             const glm::vec4 col = { 0.0f, 1.0f, 1.0f, 1.0f };
-            Debug::DrawLine(position, position + dir * len, 0.2f, col, col);
+            //Debug::DrawLine(position, position + dir * len, 0.2f, col, col);
 
             Physics::RaycastPayload payload = Physics::Raycast(level, position, dir, len);
 
@@ -97,7 +98,7 @@ namespace Game
             {
                 //if (glm::dot(payload.hitNormal, linearVelocity) < 0.0f) payload.hitNormal *= -1.0f;
                 
-                Debug::DrawLine(payload.hitPoint, payload.hitPoint + payload.hitNormal, 2.0f, glm::vec4(1, 0, 1, 1), glm::vec4(1, 0, 1, 1));
+                //Debug::DrawLine(payload.hitPoint, payload.hitPoint + payload.hitNormal, 2.0f, glm::vec4(1, 0, 1, 1), glm::vec4(1, 0, 1, 1));
                 
                 if (payload.hitDistance < closest.hitDistance) {
                     closest = std::move(payload);

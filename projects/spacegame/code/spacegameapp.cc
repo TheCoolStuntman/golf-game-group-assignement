@@ -180,13 +180,13 @@ SpaceGameApp::Run()
 
     // game loop
     while (this->window->IsOpen())
-	{
+    {
         auto timeStart = std::chrono::steady_clock::now();
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-        
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+
         this->window->Update();
         if (auto cgp = Input::GetCurrentGamepad(); cgp != nullptr)
             cgp->Update();
@@ -200,7 +200,7 @@ SpaceGameApp::Run()
         }
 
         ship.Update(dt);
-                
+
         //Highscore system
         if (ship.CheckCollisions(level, flagColliderId)) {
             std::string line;
@@ -216,7 +216,7 @@ SpaceGameApp::Run()
                 scores.push_back(line);
             }
             inputFile.close();
-            
+
             std::ofstream outputFile("levels/highscores.txt");
             if (!outputFile) throw(std::exception("no highscore file found"));
 
@@ -227,43 +227,32 @@ SpaceGameApp::Run()
 
 
             ship.position = { 0, 0, 0 };
+            ship.transform = glm::mat4(1);
             ship.linearVelocity = { 0, 0, 0 };
             ship.camRot = { 0, 0, 0, };
             ship.position.y = 1.0f;
             Physics::RaycastPayload hit = Physics::Raycast(level, glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
             ship.position.y -= hit.hitDistance;
             ship.strokes = 0;
-            ++cl %= 3;
-            level.tiles.clear();
-            flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
-        }
-
-        //Is probably a better way to do this but didn't want to send the entire map every tick to a function 
-        if (auto cgp = Input::GetCurrentGamepad(); cgp == nullptr) {
-            if (kbd->pressed[Input::Key::K]) {
-                ++cl %= 3;
-                level.tiles.clear();
-                flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
-            }
-        } else {
-            if (gpd->pressed[Input::GamepadButton::X]) {
-                ++cl %= 3;
+            if (++cl == 3) won = true;
+            else {
                 level.tiles.clear();
                 flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
             }
         }
-        
 
-        // Store all drawcalls in the render device
-        for (auto const& tile : level.tiles) {
-            RenderDevice::Draw(tile.model, tile.transform);
+        if (!won) {
+            // Store all drawcalls in the render device
+            for (auto const& tile : level.tiles) {
+                RenderDevice::Draw(tile.model, tile.transform);
+            }
+
+            RenderDevice::Draw(ship.model, ship.transform);
+
+            // Execute the entire rendering pipeline
+            RenderDevice::Render(this->window, dt);
+            //Physics::DebugDrawColliders();
         }
-
-        RenderDevice::Draw(ship.model, ship.transform);
-
-        // Execute the entire rendering pipeline
-        RenderDevice::Render(this->window, dt);
-        //Physics::DebugDrawColliders();
 
 		// transfer new frame to window
         this->window->SwapBuffers();
@@ -305,15 +294,27 @@ void
 SpaceGameApp::RenderNanoVG(NVGcontext* vg)
 {
     nvgSave(vg);
+    if (!won) {
+        nvgBeginPath(vg);
+        nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
+        nvgStroke(vg);
 
-    nvgBeginPath(vg);
-    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
-    nvgStroke(vg);
-    nvgFontSize(vg, 18.0f);
-    nvgFontFace(vg, "sans");
-    nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
+        nvgFontSize(vg, 18.0f);
+        nvgFontFace(vg, "sans");
+        nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
+        nvgText(vg, 0, 30, ("Shooting power: " + std::to_string(ship.shootPower)).c_str(), NULL);
+    }
+    else {
+        nvgBeginPath(vg);
+        nvgRect(vg, 0, 0, 1280, 720);
+        nvgFillColor(vg, nvgRGBA(50, 200, 150, 255));
+        nvgFill(vg);
 
-    nvgText(vg, 0, 30, ("Shooting power: " + std::to_string(ship.shootPower)).c_str(), NULL);
+        nvgFontSize(vg, 64.0f);
+        nvgFontFace(vg, "sans");
+        nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
+        nvgText(vg, 1280.0f / 2 - 32.0f * 3.5f, 720.0f / 2 - 32.0f, "You Won", NULL);
+    }
 
     nvgRestore(vg);
 }

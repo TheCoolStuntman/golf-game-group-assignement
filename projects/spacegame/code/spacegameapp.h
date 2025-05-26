@@ -38,5 +38,7 @@ private:
 
 	SpaceShip ship;
 	Level::Level level;
+
+	bool won = false;
 };
 } // namespace Game
