@@ -39,15 +39,18 @@ struct SpaceShip
     bool CheckCollisions(const Level::Level& level, Physics::ColliderId flagColliderId);
     
     const std::vector<glm::vec3> colliderEndPoints = {
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(-160.0f), glm::vec3(0, 1, 0)))),
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(-120.0f), glm::vec3(0, 1, 0)))),   // -90
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(-80.0f), glm::vec3(0, 1, 0)))),  // -60
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(-40.0f), glm::vec3(0, 1, 0)))),   // -30
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(-150.0f), glm::vec3(0, 1, 0)))),
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(-120.0f), glm::vec3(0, 1, 0)))),
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(-90.0f), glm::vec3(0, 1, 0)))),   // -90
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(-60.0f), glm::vec3(0, 1, 0)))),  // -60
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(-30.0f), glm::vec3(0, 1, 0)))),   // -30
         glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f)),   // 0
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(40.0f), glm::vec3(0, 1, 0)))),    // 30
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(80.0f), glm::vec3(0, 1, 0)))),    // 60
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(120.0f), glm::vec3(0, 1, 0)))),   // 90
-        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(160.0f), glm::vec3(0, 1, 0)))),
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(30.0f), glm::vec3(0, 1, 0)))),    // 30
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(60.0f), glm::vec3(0, 1, 0)))),    // 60
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 1, 0)))),   // 90
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(120.0f), glm::vec3(0, 1, 0)))),
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(150.0f), glm::vec3(0, 1, 0)))),
+        glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(180.0f), glm::vec3(0, 1, 0)))),
     };
 };
 
