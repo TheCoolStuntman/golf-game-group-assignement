@@ -264,6 +264,8 @@ Window::Open()
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glewExperimental = true;
 
+	glfwSwapInterval(0);
+
 	// open window
 	this->window = glfwCreateWindow(this->width, this->height, this->title.c_str(), nullptr, nullptr);
 	glfwMakeContextCurrent(this->window);
