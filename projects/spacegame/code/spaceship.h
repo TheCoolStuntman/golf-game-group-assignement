@@ -37,6 +37,8 @@ struct SpaceShip
     void Update(float dt);
 
     bool CheckCollisions(const Level::Level& level, Physics::ColliderId flagColliderId);
+
+    void ResetPos(const Level::Level& level);
     
     const std::vector<glm::vec3> colliderEndPoints = {
         glm::normalize(glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)* glm::rotate(glm::radians(-150.0f), glm::vec3(0, 1, 0)))),

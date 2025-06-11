@@ -11,6 +11,8 @@
 #include "spaceship.h"
 #include "core/level.h"
 
+#include <array>
+
 namespace Game
 {
 class SpaceGameApp : public Core::App
@@ -38,6 +40,8 @@ private:
 
 	SpaceShip ship;
 	Level::Level level;
+	std::array<int, 3> playerScores;
+	std::array<int, 3> highScores;
 
 	bool won = false;
 };

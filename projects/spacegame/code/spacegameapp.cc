@@ -171,12 +171,25 @@ SpaceGameApp::Run()
     }
 
     ship.model = LoadModel("assets/golf/ball-blue.glb");
-    ship.position.y = 1.0f;
-    Physics::RaycastPayload hit = Physics::Raycast(level, glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
-    ship.position.y -= hit.hitDistance;
+    ship.ResetPos(level);
+
+    std::string line;
+    std::ifstream inputFile("levels/highscores.txt");
+    if (!inputFile) {
+        this->Close();
+        return;
+    }
+
+    for (int i = 0; std::getline(inputFile, line); i++) {
+        highScores[i] = stoi(line);
+    }
+    inputFile.close();
+    playerScores = {999, 999, 999};
 
     std::clock_t c_start = std::clock();
     double dt = 0.01667f;
+
+    //won = true;
 
     // game loop
     while (this->window->IsOpen())
@@ -203,43 +216,11 @@ SpaceGameApp::Run()
 
         //Highscore system
         if (ship.CheckCollisions(level, flagColliderId)) {
-            std::string line;
-            std::ifstream inputFile("levels/highscores.txt");
-            if (!inputFile) {
-                this->Close();
-                break;
-            }
 
-            std::vector<std::string> scores;
-            for (int i = 0; std::getline(inputFile, line); i++) {
-                if (i == cl && stoi(line) > ship.strokes) {
-                    scores.push_back(std::to_string(ship.strokes));
-                    continue;
-                }
-                scores.push_back(line);
-            }
-            inputFile.close();
-
-            std::ofstream outputFile("levels/highscores.txt");
-            if (!outputFile) {
-                this->Close();
-                break;
-            }
-
-            for (std::string line : scores) {
-                outputFile << line << "\n";
-            }
-            outputFile.close();
-
-
-            ship.position = { 0, 0, 0 };
-            ship.transform = glm::mat4(1);
-            ship.linearVelocity = { 0, 0, 0 };
-            ship.camRot = { 0, 0, 0, };
-            ship.position.y = 1.0f;
-            Physics::RaycastPayload hit = Physics::Raycast(level, glm::vec3(ship.position.x, ship.position.y - 0.03f, ship.position.z), glm::vec3(0, -1.0f, 0), 10.0f);
-            ship.position.y -= hit.hitDistance;
-            ship.strokes = 0;
+            //Score go here
+            if (ship.strokes < playerScores[cl]) playerScores[cl] = ship.strokes;
+            
+            ship.ResetPos(level);
             if (++cl == 3) won = true;
             else {
                 level.tiles.clear();
@@ -258,6 +239,23 @@ SpaceGameApp::Run()
             // Execute the entire rendering pipeline
             RenderDevice::Render(this->window, dt);
             //Physics::DebugDrawColliders();
+        }
+
+        //Is probably a better way to do this but didn't want to send the entire map every tick to a function 
+        if (auto cgp = Input::GetCurrentGamepad(); cgp == nullptr) {
+            if (kbd->pressed[Input::Key::K]) {
+                ship.ResetPos(level);
+                ++cl %= 3;
+                level.tiles.clear();
+                flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
+            }
+        } else {
+            if (gpd->pressed[Input::GamepadButton::X]) {
+                ship.ResetPos(level);
+                ++cl %= 3;
+                level.tiles.clear();
+                flagColliderId = levelLoader::loadLevel(levelPath[cl], level, golfModels, golfColliderMeshes);
+            }
         }
 
 		// transfer new frame to window
@@ -279,6 +277,19 @@ SpaceGameApp::Run()
 void
 SpaceGameApp::Exit()
 {
+    for (int i = 0; i < 3; ++i) {
+        if (playerScores[i] < highScores[i]) highScores[i] = playerScores[i];
+    }
+    std::ofstream outputFile("levels/highscores.txt", std::ios::trunc);
+    if (!outputFile) {
+        this->Close();
+        return;
+    }
+
+    for (auto el : highScores) {
+        outputFile << std::to_string(el) << "\n";
+    }
+    outputFile.close();
     this->window->Close();
 }
 
@@ -300,26 +311,29 @@ void
 SpaceGameApp::RenderNanoVG(NVGcontext* vg)
 {
     nvgSave(vg);
-    if (!won) {
+    if (won) {
+        int _w, _h;
+        window->GetSize(_w, _h);
+        float w = (float)_w, h = (float)_h;
         nvgBeginPath(vg);
-        nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
-        nvgStroke(vg);
-
-        nvgFontSize(vg, 18.0f);
-        nvgFontFace(vg, "sans");
-        nvgFillColor(vg, nvgRGBA(255, 255, 255, 180));
-        nvgText(vg, 0, 30, ("Shooting power: " + std::to_string(ship.shootPower)).c_str(), NULL);
-    }
-    else {
-        nvgBeginPath(vg);
-        nvgRect(vg, 0, 0, 1280, 720);
+        nvgRect(vg, 0, 0, w, h);
         nvgFillColor(vg, nvgRGBA(50, 200, 150, 255));
         nvgFill(vg);
 
         nvgFontSize(vg, 64.0f);
         nvgFontFace(vg, "sans");
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
-        nvgText(vg, 1280.0f / 2 - 32.0f * 3.5f, 720.0f / 2 - 32.0f, "You Won", NULL);
+        nvgText(vg, w / 2 - 32.0f * 3.5f, h / 2 - 32.0f, "You Won", NULL);
+
+        nvgText(vg, w / 2 - 135.0f * 3.5f, h / 2 + 60.0f, "Your Scores", NULL);
+        nvgText(vg, w / 2 - 90.0f * 3.5f, h / 2 + 140.0f, std::to_string(playerScores[0]).c_str(), NULL);
+        nvgText(vg, w / 2 - 90.0f * 3.5f, h / 2 + 220.0f, std::to_string(playerScores[1]).c_str(), NULL);
+        nvgText(vg, w / 2 - 90.0f * 3.5f, h / 2 + 300.0f, std::to_string(playerScores[2]).c_str(), NULL);
+
+        nvgText(vg, w / 2 + 45.0f * 3.5f, h / 2 + 60.0f, "High Scores", NULL);
+        nvgText(vg, w / 2 + 90.0f * 3.5f, h / 2 + 140.0f, std::to_string(highScores[0]).c_str(), NULL);
+        nvgText(vg, w / 2 + 90.0f * 3.5f, h / 2 + 220.0f, std::to_string(highScores[1]).c_str(), NULL);
+        nvgText(vg, w / 2 + 90.0f * 3.5f, h / 2 + 300.0f, std::to_string(highScores[2]).c_str(), NULL);
     }
 
     nvgRestore(vg);

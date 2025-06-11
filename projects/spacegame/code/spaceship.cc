@@ -116,4 +116,15 @@ namespace Game
         }
         return false;
     }
+    void SpaceShip::ResetPos(const Level::Level& level)
+    {
+        position = { 0, 0, 0 };
+        transform = glm::mat4(1);
+        linearVelocity = { 0, 0, 0 };
+        camRot = { 0, glm::radians(180.0f), 0,};
+        position.y = 1.0f;
+        Physics::RaycastPayload hit = Physics::Raycast(level, glm::vec3(position.x, position.y - 0.03f, position.z), glm::vec3(0, -1.0f, 0), 10.0f);
+        position.y -= hit.hitDistance;
+        strokes = 0;
+    }
 }
