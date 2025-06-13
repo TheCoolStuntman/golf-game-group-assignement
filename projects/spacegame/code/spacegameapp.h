@@ -44,5 +44,6 @@ private:
 	std::array<int, 3> highScores;
 
 	bool won = false;
+	double dt;
 };
 } // namespace Game

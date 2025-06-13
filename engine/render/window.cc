@@ -448,8 +448,8 @@ Window::SwapBuffers()
 		
 		//ImGui::Render();
 		//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		glFlush();
-		glFinish();
+		//glFlush();
+		//glFinish();
 		glfwSwapBuffers(this->window);
 	}
 }

@@ -54,7 +54,7 @@ SpaceGameApp::Open()
 {
 	App::Open();
 	this->window = new Display::Window;
-    this->window->SetSize(1280, 720);
+    this->window->SetSize(1920, 1080);
 
     if (this->window->Open())
 	{
@@ -186,8 +186,7 @@ SpaceGameApp::Run()
     inputFile.close();
     playerScores = {999, 999, 999};
 
-    std::clock_t c_start = std::clock();
-    double dt = 0.01667f;
+    //std::clock_t c_start = std::clock();
 
     //won = true;
 
@@ -263,6 +262,8 @@ SpaceGameApp::Run()
 
         auto timeEnd = std::chrono::steady_clock::now();
         dt = std::min(0.04, std::chrono::duration<double>(timeEnd - timeStart).count());
+	//dt = std::chrono::duration<double>(timeEnd - timeStart).count();
+
 
         if (auto cgp = Input::GetCurrentGamepad(); cgp && cgp->pressed[Input::GamepadButton::Code::BACK])
             this->Exit();
@@ -335,7 +336,6 @@ SpaceGameApp::RenderNanoVG(NVGcontext* vg)
         nvgText(vg, w / 2 + 90.0f * 3.5f, h / 2 + 220.0f, std::to_string(highScores[1]).c_str(), NULL);
         nvgText(vg, w / 2 + 90.0f * 3.5f, h / 2 + 300.0f, std::to_string(highScores[2]).c_str(), NULL);
     }
-
     nvgRestore(vg);
 }
 

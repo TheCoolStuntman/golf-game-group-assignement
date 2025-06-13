@@ -55,7 +55,7 @@ namespace Input {
         float DeadZone = 0.1f;
 
         Gamepad(int id);
-        ~Gamepad();
+	~Gamepad();
 
         void Update();
     };

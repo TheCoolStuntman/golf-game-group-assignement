@@ -536,7 +536,7 @@ RenderDevice::Render(Display::Window* wnd, float dt)
     // end lightculling compute pass
 
     // Begin sun shadowmap renderpass. this has a single subpass, with two subpass dependencies for layout transitions (shader-read -> depth-write, and back)
-    Instance()->StaticShadowPass();
+    //Instance()->StaticShadowPass();
     // end sun shadowmap renderpass
 
     // begin forward shading renderpass
@@ -555,7 +555,7 @@ RenderDevice::Render(Display::Window* wnd, float dt)
 
     // begin debug drawing renderpass
     Debug::DispatchDebugDrawing();
-    LightServer::DebugDrawPointLights();
+    //LightServer::DebugDrawPointLights();
     // end debug drawing renderpass
 
     // begin finalization pass and present
